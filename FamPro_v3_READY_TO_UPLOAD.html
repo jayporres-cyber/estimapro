@@ -1,0 +1,1510 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FamPro — powered by EstimaPro</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0C0A08; --surface:#141210; --card:#1A1714; --border:#2A2520; --border2:#3A3028;
+  --gold:#D4A017; --gold2:#F0C040; --amber:#FF8C00;
+  --cream:#E8DFC8; --muted:#6B5F4A; --green:#4CAF72; --red:#CF4444; --blue:#4A8FD4;
+  --purple:#9B6FD4; --text:#C8B898;
+  --mono:'JetBrains Mono',monospace; --head:'Syne',sans-serif;
+  /* Role colors */
+  --client-c:#4A8FD4; --admin-c:#D4A017; --eng-c:#4CAF72;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--head);min-height:100vh;
+  background-image:radial-gradient(circle at 15% 50%,rgba(212,160,23,.03) 0%,transparent 50%),
+  radial-gradient(circle at 85% 20%,rgba(74,143,212,.02) 0%,transparent 40%);}
+
+/* ── LOGIN SCREEN ── */
+#login-screen{
+  position:fixed;inset:0;background:var(--bg);z-index:9999;
+  display:flex;align-items:center;justify-content:center;
+  background-image:
+    linear-gradient(rgba(212,160,23,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(212,160,23,.04) 1px,transparent 1px);
+  background-size:50px 50px;
+}
+.login-box{
+  background:var(--card);border:1px solid var(--border2);border-radius:16px;
+  padding:40px;width:100%;max-width:420px;
+  box-shadow:0 32px 80px rgba(0,0,0,.6);
+}
+.login-brand{text-align:center;margin-bottom:32px;}
+.login-logo{
+  width:56px;height:56px;background:var(--gold);border-radius:12px;
+  display:flex;align-items:center;justify-content:center;font-size:1.8rem;
+  margin:0 auto 12px;box-shadow:0 0 30px rgba(212,160,23,.3);
+}
+.login-title{font-size:1.6rem;font-weight:800;color:var(--cream);}
+.login-title span{color:var(--gold);}
+.login-sub{font-family:var(--mono);font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-top:4px;}
+.role-cards{display:grid;gap:10px;margin-bottom:24px;}
+.role-card{
+  background:var(--surface);border:2px solid var(--border);border-radius:10px;
+  padding:14px 16px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:12px;
+}
+.role-card:hover{border-color:var(--gold);background:rgba(212,160,23,.04);}
+.role-card.selected{border-color:var(--gold2);background:rgba(212,160,23,.07);}
+.rc-icon{font-size:1.5rem;flex-shrink:0;}
+.rc-name{font-size:.95rem;font-weight:700;color:var(--cream);}
+.rc-desc{font-family:var(--mono);font-size:.62rem;color:var(--muted);}
+.rc-badge{margin-left:auto;font-family:var(--mono);font-size:.58rem;padding:3px 8px;border-radius:20px;white-space:nowrap;}
+.rcb-owner{background:rgba(74,143,212,.15);color:var(--owner-c);}
+.rcb-admin{background:rgba(212,160,23,.15);color:var(--admin-c);}
+.rcb-eng{background:rgba(76,175,114,.15);color:var(--eng-c);}
+.fl{margin-bottom:12px;}
+.fl label{display:block;font-family:var(--mono);font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:5px;}
+.fi{width:100%;background:#0C0A08;border:1px solid var(--border2);border-radius:6px;color:var(--cream);font-family:var(--mono);font-size:.88rem;padding:9px 11px;outline:none;transition:border-color .15s;}
+.fi:focus{border-color:var(--gold);}
+.btn-login{width:100%;background:linear-gradient(135deg,var(--gold),var(--amber));color:#000;border:none;border-radius:8px;padding:13px;font-family:var(--head);font-size:1rem;font-weight:800;letter-spacing:1px;cursor:pointer;transition:opacity .15s;}
+.btn-login:hover{opacity:.9;}
+
+/* ── TOPBAR ── */
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:200;}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand-mark{width:32px;height:32px;background:var(--gold);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1rem;box-shadow:0 0 16px rgba(212,160,23,.25);}
+.brand-name{font-size:1.2rem;font-weight:800;color:var(--cream);}
+.brand-name span{color:var(--gold);}
+.topbar-center{display:flex;align-items:center;gap:8px;}
+.role-chip{display:flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-family:var(--mono);font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;border:1px solid;}
+.rc-client-chip{background:rgba(74,143,212,.1);border-color:rgba(74,143,212,.3);color:var(--client-c);}
+.rc-admin-chip{background:rgba(212,160,23,.1);border-color:rgba(212,160,23,.3);color:var(--admin-c);}
+.rc-eng-chip{background:rgba(76,175,114,.1);border-color:rgba(76,175,114,.3);color:var(--eng-c);}
+.user-name-top{font-size:.8rem;color:var(--muted);}
+.topbar-right{display:flex;align-items:center;gap:8px;}
+.credit-pill{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border2);border-radius:8px;padding:6px 12px;cursor:pointer;transition:border-color .2s;}
+.credit-pill:hover{border-color:var(--gold);}
+.credit-pill.low{border-color:var(--red);}
+.credit-pill.low .ca{color:var(--red);}
+.ca{font-family:var(--mono);font-size:.95rem;font-weight:700;color:var(--gold2);}
+.cw{font-family:var(--mono);font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+.btn-top{padding:6px 14px;border-radius:6px;font-family:var(--head);font-size:.78rem;font-weight:700;cursor:pointer;border:none;transition:all .15s;}
+.btn-buy-top{background:var(--gold);color:#000;}
+.btn-buy-top:hover{background:var(--gold2);}
+.btn-logout{background:var(--card);border:1px solid var(--border2);color:var(--muted);}
+.btn-logout:hover{color:var(--text);border-color:var(--border2);}
+
+/* ── LAYOUT ── */
+.shell{display:flex;min-height:calc(100vh - 58px);}
+.nav{width:210px;background:var(--surface);border-right:1px solid var(--border);padding:16px 0;position:sticky;top:58px;height:calc(100vh - 58px);flex-shrink:0;display:flex;flex-direction:column;overflow-y:auto;}
+.nav-cat{padding:10px 18px 4px;font-family:var(--mono);font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:2.5px;}
+.nl{display:flex;align-items:center;gap:8px;padding:9px 18px;font-size:.84rem;font-weight:600;color:var(--muted);cursor:pointer;border-left:2px solid transparent;transition:all .15s;user-select:none;}
+.nl:hover:not(.nl-dis){color:var(--text);background:rgba(212,160,23,.04);}
+.nl.nla{color:var(--gold2);border-left-color:var(--gold);background:rgba(212,160,23,.07);}
+.nl.nl-dis{opacity:.3;cursor:not-allowed;}
+.np{margin-left:auto;font-family:var(--mono);font-size:.56rem;padding:2px 6px;border-radius:20px;}
+.np-free{background:rgba(76,175,114,.15);color:var(--green);}
+.np-coin{background:rgba(212,160,23,.15);color:var(--gold);}
+.np-lock{background:rgba(207,68,68,.1);color:var(--red);}
+.nav-spacer{flex:1;}
+.nav-ver{padding:10px 18px;font-family:var(--mono);font-size:.58rem;color:#2A2520;}
+
+/* ── MAIN ── */
+.main{flex:1;padding:28px 32px;overflow-x:hidden;max-width:1040px;}
+.sec{display:none;}
+.sec.sa{display:block;animation:fi .25s ease;}
+@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── PAGE HEADER ── */
+.ph{margin-bottom:24px;padding-bottom:18px;border-bottom:1px solid var(--border);display:flex;align-items:flex-end;justify-content:space-between;gap:12px;}
+.ph-title{font-size:1.8rem;font-weight:800;color:var(--cream);letter-spacing:-.5px;line-height:1;}
+.ph-title em{color:var(--gold);font-style:normal;}
+.ph-sub{font-family:var(--mono);font-size:.68rem;color:var(--muted);margin-top:5px;}
+.ph-badge{font-family:var(--mono);font-size:.68rem;padding:5px 11px;border-radius:6px;border:1px solid;white-space:nowrap;}
+.phb-free{border-color:rgba(76,175,114,.4);color:var(--green);}
+.phb-cost{border-color:rgba(212,160,23,.4);color:var(--gold);}
+.phb-admin{border-color:rgba(212,160,23,.5);color:var(--admin-c);background:rgba(212,160,23,.06);}
+
+/* ── CARDS / GRID ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;}
+.card+.card{margin-top:14px;}
+.card-hd{font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:14px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+@media(max-width:800px){.g2,.g3,.g4{grid-template-columns:1fr 1fr;}}
+@media(max-width:500px){.g2,.g3,.g4{grid-template-columns:1fr;}}
+
+/* ── FORM ── */
+.fl2{margin-bottom:11px;}
+.fl2 label{display:block;font-family:var(--mono);font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px;}
+.fh{font-family:var(--mono);font-size:.6rem;color:#3A3028;margin-top:2px;}
+select.fi option{background:#1A1714;}
+
+/* ── BUTTONS ── */
+.btn-go{width:100%;background:linear-gradient(135deg,var(--gold),var(--amber));color:#000;border:none;border-radius:8px;padding:12px;font-family:var(--head);font-size:.95rem;font-weight:800;letter-spacing:1px;cursor:pointer;margin-top:6px;transition:opacity .15s,transform .1s;}
+.btn-go:hover{opacity:.9;}
+.btn-go:active{transform:scale(.99);}
+.btn-sm{padding:6px 14px;border-radius:6px;font-family:var(--head);font-size:.78rem;font-weight:700;cursor:pointer;border:none;transition:all .15s;}
+.btn-danger{background:rgba(207,68,68,.15);border:1px solid rgba(207,68,68,.3);color:var(--red);}
+.btn-danger:hover{background:rgba(207,68,68,.25);}
+.btn-success{background:rgba(76,175,114,.15);border:1px solid rgba(76,175,114,.3);color:var(--green);}
+.btn-success:hover{background:rgba(76,175,114,.25);}
+.btn-muted{background:var(--card);border:1px solid var(--border2);color:var(--muted);}
+.btn-muted:hover{color:var(--text);}
+
+/* ── RESULTS ── */
+.res{display:none;}
+.res.show{display:block;animation:fi .3s ease;}
+.metrics{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:14px;}
+.met{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:13px 12px;border-top:2px solid var(--gold);animation:metIn .4s ease both;}
+.met.mg{border-top-color:var(--green);}
+.met.ma{border-top-color:var(--amber);}
+.met.mb{border-top-color:var(--blue);}
+@keyframes metIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.met-v{font-size:1.5rem;font-weight:800;color:var(--cream);line-height:1;font-family:var(--mono);}
+.met-l{font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-top:3px;}
+
+/* ── TABLE ── */
+.tbl{width:100%;border-collapse:collapse;font-size:.8rem;}
+.tbl th{text-align:left;padding:8px 12px;background:#0C0A08;font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);border-bottom:1px solid var(--border);}
+.tbl td{padding:8px 12px;border-bottom:1px solid rgba(42,37,32,.5);font-family:var(--mono);}
+.tbl tr:hover td{background:rgba(212,160,23,.02);}
+.tv{color:var(--gold2);font-weight:700;}
+.tu{color:var(--muted);font-size:.72rem;}
+
+/* ── PRICE BOX ── */
+.pbox{background:linear-gradient(135deg,#1A1410,#100E0A);border:1px solid rgba(212,160,23,.25);border-radius:10px;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;margin:12px 0;}
+.pl{font-family:var(--mono);font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+.pv{font-family:var(--mono);font-size:1.7rem;font-weight:700;color:var(--gold2);line-height:1.1;}
+.pn{font-family:var(--mono);font-size:.58rem;color:var(--muted);}
+
+/* ── ALERTS / NOTES ── */
+.al{border-radius:8px;padding:11px 15px;font-family:var(--mono);font-size:.75rem;margin-bottom:14px;}
+.al-info{background:rgba(74,143,212,.07);border:1px solid rgba(74,143,212,.2);color:#7ab4e0;}
+.al-warn{background:rgba(255,140,0,.07);border:1px solid rgba(255,140,0,.2);color:#d4904a;}
+.al-err{background:rgba(207,68,68,.07);border:1px solid rgba(207,68,68,.2);color:#e07a7a;}
+.al-ok{background:rgba(76,175,114,.07);border:1px solid rgba(76,175,114,.2);color:#7dbf94;}
+.note{background:rgba(76,175,114,.05);border:1px solid rgba(76,175,114,.15);border-radius:8px;padding:13px 15px;font-family:var(--mono);font-size:.75rem;color:#7dbf94;line-height:1.8;}
+.note strong{color:#aae0b8;}
+.disc{font-family:var(--mono);font-size:.62rem;color:var(--border2);text-align:center;padding:10px;margin-top:10px;}
+
+/* ── MODAL / DIALOG ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.modal-overlay.hidden{display:none;}
+.modal-box{background:var(--card);border:1px solid var(--border2);border-radius:14px;padding:28px;width:100%;max-width:460px;box-shadow:0 24px 60px rgba(0,0,0,.6);animation:fi .2s ease;}
+.modal-title{font-size:1.1rem;font-weight:800;color:var(--cream);margin-bottom:8px;}
+.modal-body{font-family:var(--mono);font-size:.78rem;color:var(--text);line-height:1.8;margin-bottom:20px;}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;}
+.modal-icon{font-size:2rem;margin-bottom:12px;}
+
+/* ── ADMIN PANEL ── */
+.owner-card{background:var(--card);border:1px solid var(--border2);border-radius:10px;padding:16px 18px;margin-bottom:10px;display:flex;align-items:center;gap:14px;}
+.oc-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
+.oc-av-client{background:rgba(74,143,212,.15);}
+.oc-info{flex:1;}
+.oc-name{font-weight:700;color:var(--cream);font-size:.9rem;}
+.oc-meta{font-family:var(--mono);font-size:.62rem;color:var(--muted);margin-top:2px;}
+.oc-credits{font-family:var(--mono);font-size:1rem;color:var(--gold2);font-weight:700;flex-shrink:0;}
+.oc-actions{display:flex;gap:6px;flex-shrink:0;}
+
+/* ── ERROR REVIEW FLOW ── */
+.error-step{background:var(--card);border:1px solid rgba(207,68,68,.3);border-radius:10px;padding:18px;margin-bottom:12px;}
+.error-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.error-badge{background:rgba(207,68,68,.15);border:1px solid rgba(207,68,68,.3);color:var(--red);font-family:var(--mono);font-size:.6rem;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:1px;}
+.error-title{font-size:.88rem;font-weight:700;color:var(--cream);}
+.error-desc{font-family:var(--mono);font-size:.75rem;color:var(--text);line-height:1.7;margin-bottom:12px;}
+.correction-field{background:#0C0A08;border:1px solid rgba(207,68,68,.3);border-radius:6px;padding:10px 12px;font-family:var(--mono);font-size:.9rem;color:var(--cream);width:100%;outline:none;}
+.correction-field:focus{border-color:var(--gold);}
+
+/* ── CREDIT WARNING ── */
+.credit-warning{
+  background:linear-gradient(135deg,#1A0E0E,#120A0A);
+  border:1px solid rgba(207,68,68,.4);border-radius:12px;padding:20px;
+  display:flex;align-items:center;gap:16px;margin-bottom:16px;
+}
+.cw-icon{font-size:2.2rem;flex-shrink:0;}
+.cw-bar{flex:1;}
+.cw-title{font-size:.9rem;font-weight:800;color:var(--red);margin-bottom:3px;}
+.cw-msg{font-family:var(--mono);font-size:.72rem;color:#c07070;line-height:1.6;}
+.cw-progress{height:4px;background:#2A1A1A;border-radius:2px;margin-top:8px;overflow:hidden;}
+.cw-fill{height:100%;background:var(--red);border-radius:2px;transition:width .5s ease;}
+.cw-btn{flex-shrink:0;}
+
+/* ── APPROVAL BADGE ── */
+.approval-section{background:rgba(76,175,114,.05);border:1px solid rgba(76,175,114,.2);border-radius:10px;padding:16px;margin-top:12px;}
+.ap-title{font-family:var(--mono);font-size:.65rem;text-transform:uppercase;letter-spacing:2px;color:var(--green);margin-bottom:10px;}
+.ap-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(76,175,114,.1);}
+.ap-item:last-child{border-bottom:none;}
+.ap-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.ap-dot-wait{background:#3A3028;border:1px solid #4A4038;}
+.ap-dot-ok{background:var(--green);box-shadow:0 0 6px rgba(76,175,114,.5);}
+.ap-dot-rej{background:var(--red);}
+.ap-name{font-size:.82rem;color:var(--text);}
+.ap-status{font-family:var(--mono);font-size:.62rem;margin-left:auto;}
+.ap-status-wait{color:var(--muted);}
+.ap-status-ok{color:var(--green);}
+.ap-status-rej{color:var(--red);}
+
+/* ── ADMIN MARGIN VIEW ── */
+.margin-panel{
+  background:linear-gradient(135deg,#1a1208,#120e06);
+  border:1px solid rgba(212,160,23,.3);
+  border-radius:10px;padding:16px 18px;margin-top:14px;
+  display:none;
+}
+.margin-panel.visible{display:block;animation:fi .25s ease;}
+.mp-title{font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:2px;color:var(--gold);margin-bottom:12px;}
+.mp-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(212,160,23,.08);font-family:var(--mono);font-size:.78rem;}
+.mp-row:last-child{border-bottom:none;font-weight:700;}
+.mp-label{color:var(--muted);}
+.mp-val{color:var(--cream);}
+.mp-profit{color:var(--green);font-size:.95rem;}
+.mp-pct{font-size:.65rem;color:var(--muted);margin-left:6px;}
+
+/* ── ADMIN DIRECT EDIT ── */
+.admin-edit-bar{
+  background:rgba(212,160,23,.06);
+  border:1px solid rgba(212,160,23,.2);
+  border-radius:8px;padding:10px 14px;
+  display:none;
+  align-items:center;gap:10px;margin-bottom:12px;
+  font-family:var(--mono);font-size:.72rem;color:var(--gold);
+}
+.admin-edit-bar.visible{display:flex;}
+.aeb-icon{font-size:1rem;}
+.aeb-unlock{background:rgba(212,160,23,.15);border:1px solid rgba(212,160,23,.3);color:var(--gold);padding:4px 10px;border-radius:5px;font-family:var(--mono);font-size:.65rem;cursor:pointer;margin-left:auto;}
+.aeb-unlock:hover{background:rgba(212,160,23,.25);}
+.fi-admin-unlocked{border-color:rgba(212,160,23,.5)!important;background:rgba(212,160,23,.04)!important;}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--card);border:1px solid var(--border2);border-radius:10px;padding:12px 18px;display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:.78rem;z-index:999;box-shadow:0 8px 32px rgba(0,0,0,.6);transform:translateY(70px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast-msg{color:var(--cream);}
+.toast-sub{color:var(--muted);font-size:.65rem;}
+
+/* ── MODULES OVERVIEW ── */
+.mod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:12px;margin-bottom:24px;}
+.mc{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+.mc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;}
+.mc-s::after{background:linear-gradient(90deg,var(--amber),var(--gold));}
+.mc-e::after{background:linear-gradient(90deg,#8B5E3C,#C4915A);}
+.mc-f::after{background:linear-gradient(90deg,#666,#aaa);}
+.mc-st::after{background:linear-gradient(90deg,var(--blue),#7AB8E8);}
+.mc-l::after{background:linear-gradient(90deg,var(--green),#80D4A0);}
+.mc:not(.mc-locked):hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.4);}
+.mc-locked{opacity:.4;cursor:not-allowed;}
+.mc-icon{font-size:1.7rem;margin-bottom:8px;}
+.mc-name{font-size:.9rem;font-weight:800;color:var(--cream);margin-bottom:3px;}
+.mc-desc{font-family:var(--mono);font-size:.65rem;color:var(--muted);line-height:1.5;}
+.mc-cost{margin-top:8px;font-family:var(--mono);font-size:.65rem;color:var(--gold);}
+.mc-badge{position:absolute;top:12px;right:12px;font-family:var(--mono);font-size:.52rem;padding:2px 7px;border-radius:20px;text-transform:uppercase;letter-spacing:1px;}
+.mcb-free{background:rgba(76,175,114,.15);color:var(--green);}
+.mcb-coin{background:rgba(212,160,23,.12);color:var(--gold);}
+.mcb-lock{background:rgba(207,68,68,.1);color:var(--red);}
+
+/* Pkg */
+.pkg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:16px;}
+.pkg{background:var(--card);border:1px solid var(--border2);border-radius:10px;padding:18px 14px;cursor:pointer;transition:all .2s;text-align:center;position:relative;}
+.pkg:hover,.pkg.pkg-sel{border-color:var(--gold);background:rgba(212,160,23,.04);}
+.pkg-check{position:absolute;top:8px;right:8px;width:18px;height:18px;background:var(--gold);border-radius:50%;display:none;align-items:center;justify-content:center;font-size:.6rem;color:#000;}
+.pkg.pkg-sel .pkg-check{display:flex;}
+.pkg-tier{font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:8px;}
+.pkg-coins{font-size:2.4rem;font-weight:800;color:var(--gold2);line-height:1;letter-spacing:-1px;}
+.pkg-price{font-family:var(--mono);font-size:.9rem;color:var(--cream);margin:6px 0 2px;}
+.pkg-per{font-family:var(--mono);font-size:.6rem;color:var(--muted);}
+.pkg-tag{display:inline-block;margin-top:8px;background:rgba(212,160,23,.12);color:var(--gold);font-family:var(--mono);font-size:.58rem;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:1px;}
+.btn-buy{width:100%;background:linear-gradient(135deg,var(--gold),var(--amber));color:#000;border:none;border-radius:8px;padding:13px;font-family:var(--head);font-size:.95rem;font-weight:800;letter-spacing:1px;cursor:pointer;display:none;transition:opacity .15s;}
+.btn-buy:hover{opacity:.9;}
+.btn-buy.vis{display:block;animation:fi .2s ease;}
+
+/* Hist */
+.hist-list{display:flex;flex-direction:column;}
+.hi{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid rgba(42,37,32,.4);}
+.hi:hover{background:rgba(212,160,23,.02);}
+.hi-ico{font-size:1rem;width:26px;text-align:center;flex-shrink:0;}
+.hi-info{flex:1;}
+.hi-name{font-size:.8rem;color:var(--text);}
+.hi-date{font-family:var(--mono);font-size:.6rem;color:var(--muted);margin-top:1px;}
+.hi-d{font-family:var(--mono);font-size:.78rem;font-weight:700;white-space:nowrap;}
+.hd-pos{color:var(--green);}
+.hd-neg{color:var(--red);}
+.hd-free{color:var(--muted);}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ LOGIN SCREEN ══════════════ -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-brand">
+      <div class="login-logo">📐</div>
+      <div class="login-title">Fam<span>Pro</span></div>
+      <div class="login-sub" style="color:var(--muted);font-family:var(--mono);font-size:.6rem;text-transform:uppercase;letter-spacing:2px;margin-top:2px">powered by EstimaPro</div>
+      <div class="login-sub">Construction Estimating · USA</div>
+    </div>
+
+    <div style="font-family:var(--mono);font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:10px">Selecciona tu rol</div>
+
+    <div class="role-cards" id="role-cards">
+      <div class="role-card" onclick="selectRole(this,'client')">
+        <div class="rc-icon">🏠</div>
+        <div>
+          <div class="rc-name">Client</div>
+          <div class="rc-desc">Envía medidas, aprueba estimados, ve tu proyecto</div>
+        </div>
+        <div class="rc-badge rcb-owner">Client</div>
+      </div>
+      <div class="role-card" onclick="selectRole(this,'admin')">
+        <div class="rc-icon">⚙️</div>
+        <div>
+          <div class="rc-name">Admin</div>
+          <div class="rc-desc">Acceso total — editar, calcular, gestionar créditos</div>
+        </div>
+        <div class="rc-badge rcb-admin">Admin</div>
+      </div>
+      <div class="role-card" onclick="selectRole(this,'engineer')">
+        <div class="rc-icon">📐</div>
+        <div>
+          <div class="rc-name">Engineer</div>
+          <div class="rc-desc">Revisar y aprobar cálculos técnicos</div>
+        </div>
+        <div class="rc-badge rcb-eng">Engineer</div>
+      </div>
+    </div>
+
+    <div class="fl">
+      <label>Nombre</label>
+      <input class="fi" type="text" id="login-name" placeholder="Tu nombre">
+    </div>
+    <div class="fl" id="pin-field">
+      <label>PIN (Admin/Engineer)</label>
+      <input class="fi" type="password" id="login-pin" placeholder="••••" maxlength="4">
+    </div>
+    <button class="btn-login" onclick="doLogin()">ENTRAR →</button>
+
+    <div style="font-family:var(--mono);font-size:.6rem;color:var(--border2);text-align:center;margin-top:14px">
+      Demo: Admin PIN = 1234 · Engineer PIN = 5678
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ TOAST ══════════════ -->
+<div class="toast" id="toast">
+  <div id="t-ico" style="font-size:1.2rem">🪙</div>
+  <div><div class="toast-msg" id="t-msg">—</div><div class="toast-sub" id="t-sub">—</div></div>
+</div>
+
+<!-- ══════════════ MODAL ══════════════ -->
+<div class="modal-overlay hidden" id="modal">
+  <div class="modal-box">
+    <div class="modal-icon" id="m-ico">⚠️</div>
+    <div class="modal-title" id="m-title">Título</div>
+    <div class="modal-body" id="m-body">Cuerpo del modal</div>
+    <div class="modal-actions" id="m-actions"></div>
+  </div>
+</div>
+
+<!-- ══════════════ APP SHELL ══════════════ -->
+<div id="app-shell" style="display:none">
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-mark">📐</div>
+    <div>
+      <div class="brand-name">Fam<span>Pro</span></div>
+    </div>
+  </div>
+  <div class="topbar-center">
+    <div class="role-chip" id="role-chip">—</div>
+    <div class="user-name-top" id="top-username">—</div>
+  </div>
+  <div class="topbar-right">
+    <div class="credit-pill" id="credit-pill" onclick="navTo('credits')">
+      <span style="font-size:.9rem">🪙</span>
+      <span class="ca" id="top-credits">0</span>
+      <span class="cw">créditos</span>
+    </div>
+    <button class="btn-top btn-buy-top" onclick="navTo('credits')">+ Recargar</button>
+    <button class="btn-top btn-logout" onclick="doLogout()">Salir</button>
+  </div>
+</div>
+
+<div class="shell">
+<!-- NAV -->
+<nav class="nav" id="main-nav">
+  <div class="nav-cat">Menú</div>
+  <div class="nl nla" id="nl-home" onclick="navTo('home')"><span>🏠</span>Inicio</div>
+  <div class="nl" id="nl-credits" onclick="navTo('credits')"><span>🪙</span>Mis Créditos</div>
+  <div class="nl" id="nl-admin" onclick="navTo('admin')"><span>⚙️</span>Admin Panel<span class="np np-lock" id="admin-badge">Admin</span></div>
+
+  <div class="nav-cat" style="margin-top:8px">Módulos</div>
+  <div class="nl" id="nl-scaff" onclick="navTo('scaff')"><span>🏗️</span>Andamios<span class="np np-free">FREE</span></div>
+  <div class="nl" id="nl-exc" onclick="navTo('exc')"><span>⛏️</span>Excavación<span class="np np-coin">5🪙</span></div>
+  <div class="nl" id="nl-found" onclick="navTo('found')"><span>🧱</span>Cimentación<span class="np np-coin">10🪙</span></div>
+  <div class="nl" id="nl-struct" onclick="navTo('struct')"><span>🏠</span>Estructura<span class="np np-coin">15🪙</span></div>
+  <div class="nl" id="nl-labor" onclick="navTo('labor')"><span>👷</span>Mano de Obra<span class="np np-coin">8🪙</span></div>
+
+  <div class="nav-cat" style="margin-top:8px">Reportes</div>
+  <div class="nl" id="nl-report" onclick="navTo('report')"><span>📄</span>Reporte Cliente<span class="np np-coin">3🪙</span></div>
+  <div class="nl" id="nl-eng-rep" onclick="navTo('eng-rep')"><span>📐</span>Reporte Ingeniero<span class="np np-coin">5🪙</span></div>
+
+  <div class="nav-spacer"></div>
+  <div class="nav-ver">FamPro · powered by EstimaPro v3.0</div>
+</nav>
+
+<div class="main">
+
+<!-- ══ HOME ══ -->
+<div class="sec sa" id="sec-home">
+  <div class="ph">
+    <div>
+      <div class="ph-title">Bienvenido a <em>FamPro</em></div>
+      <div class="ph-sub" id="home-sub">// cargando...</div>
+    </div>
+  </div>
+  <div id="credit-warning-home"></div>
+  <div class="al al-info">💡 Cada módulo tiene un costo en créditos. Andamios es gratuito e ilimitado. Los demás consumen créditos por estimado generado.</div>
+  <div class="mod-grid">
+    <div class="mc mc-s" onclick="navTo('scaff')"><div class="mc-badge mcb-free">FREE</div><div class="mc-icon">🏗️</div><div class="mc-name">Andamios</div><div class="mc-desc">Frames, plataformas, puntales, ormaletas, base plates, guardrails.</div><div class="mc-cost">✅ Gratis · Ilimitado</div></div>
+    <div class="mc mc-e" onclick="navTo('exc')"><div class="mc-badge mcb-coin">5🪙</div><div class="mc-icon">⛏️</div><div class="mc-name">Excavación</div><div class="mc-desc">Movimiento de tierra, basement, retroexcavadora, volumen, camiones.</div><div class="mc-cost">🪙 5 créditos</div></div>
+    <div class="mc mc-f" onclick="navTo('found')"><div class="mc-badge mcb-coin">10🪙</div><div class="mc-icon">🧱</div><div class="mc-name">Cimentación</div><div class="mc-desc">Footings, foundation walls, losa, concreto yd³, varilla, waterproofing.</div><div class="mc-cost">🪙 10 créditos</div></div>
+    <div class="mc mc-st" onclick="navTo('struct')"><div class="mc-badge mcb-coin">15🪙</div><div class="mc-icon">🏠</div><div class="mc-name">Estructura</div><div class="mc-desc">Framing, lumber bf, techo sq, ventanas, puertas, exterior sheathing.</div><div class="mc-cost">🪙 15 créditos</div></div>
+    <div class="mc mc-l" onclick="navTo('labor')"><div class="mc-badge mcb-coin">8🪙</div><div class="mc-icon">👷</div><div class="mc-name">Mano de Obra</div><div class="mc-desc">Salario por estado USA, prevailing wage, horas estimadas, overtime.</div><div class="mc-cost">🪙 8 créditos</div></div>
+    <div class="mc mc-s" onclick="navTo('report')"><div class="mc-badge mcb-coin">3🪙</div><div class="mc-icon">📄</div><div class="mc-name">Reporte Cliente</div><div class="mc-desc">Documento limpio por etapas. El Client no ve los cálculos.</div><div class="mc-cost">🪙 3 créditos</div></div>
+  </div>
+</div>
+
+<!-- ══ CREDITS ══ -->
+<div class="sec" id="sec-credits">
+  <div class="ph">
+    <div><div class="ph-title"><em>Mis Créditos</em></div><div class="ph-sub">// los créditos nunca vencen</div></div>
+    <div style="font-family:var(--mono);font-size:2.2rem;font-weight:800;color:var(--gold2)" id="credits-hero-num">0 🪙</div>
+  </div>
+  <div id="credit-warning-credits"></div>
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-hd">Selecciona un paquete</div>
+    <div class="pkg-grid">
+      <div class="pkg" onclick="selectPkg(this,25,4.99,'Starter')"><div class="pkg-check">✓</div><div class="pkg-tier">Starter</div><div class="pkg-coins">25</div><div class="pkg-price">$4.99</div><div class="pkg-per">$0.20/crédito</div></div>
+      <div class="pkg" onclick="selectPkg(this,100,14.99,'Popular')"><div class="pkg-check">✓</div><div class="pkg-tier">Popular</div><div class="pkg-coins">100</div><div class="pkg-price">$14.99</div><div class="pkg-per">$0.15/crédito</div><div class="pkg-tag">⭐ Mejor valor</div></div>
+      <div class="pkg" onclick="selectPkg(this,300,34.99,'Pro')"><div class="pkg-check">✓</div><div class="pkg-tier">Pro</div><div class="pkg-coins">300</div><div class="pkg-price">$34.99</div><div class="pkg-per">$0.12/crédito</div></div>
+      <div class="pkg" onclick="selectPkg(this,1000,89.99,'Business')"><div class="pkg-check">✓</div><div class="pkg-tier">Business</div><div class="pkg-coins">1,000</div><div class="pkg-price">$89.99</div><div class="pkg-per">$0.09/crédito</div><div class="pkg-tag">🏢 Equipos</div></div>
+    </div>
+    <button class="btn-buy" id="btn-buy" onclick="doBuy()">SELECCIONA UN PAQUETE</button>
+  </div>
+  <div class="card">
+    <div class="card-hd">Historial de transacciones</div>
+    <div class="hist-list" id="hist-list"><div style="padding:20px;text-align:center;font-family:var(--mono);font-size:.72rem;color:var(--muted)">Aún sin transacciones</div></div>
+  </div>
+</div>
+
+<!-- ══ ADMIN PANEL ══ -->
+<div class="sec" id="sec-admin">
+  <div class="ph">
+    <div><div class="ph-title">⚙️ Panel <em>Admin</em></div><div class="ph-sub">// gestión de usuarios, créditos y aprobaciones</div></div>
+    <div class="ph-badge phb-admin">🔐 Solo Admin</div>
+  </div>
+  <div id="admin-locked-msg" class="al al-err">🔒 Acceso restringido. Solo los Admins pueden ver este panel.</div>
+  <div id="admin-content" style="display:none">
+    <div class="g2" style="margin-bottom:14px">
+      <div class="card">
+        <div class="card-hd">Clients activos</div>
+        <div id="owner-list"></div>
+      </div>
+      <div class="card">
+        <div class="card-hd">Ajuste manual de créditos</div>
+        <div class="fl2"><label>Seleccionar Client</label>
+          <select class="fi" id="adj-owner"><option value="demo_owner">Demo Owner (125🪙)</option></select></div>
+        <div class="fl2"><label>Cantidad de créditos</label>
+          <input class="fi" type="number" id="adj-amount" value="25" min="1"></div>
+        <div class="fl2"><label>Motivo</label>
+          <select class="fi" id="adj-reason">
+            <option value="refund">Reembolso — error del sistema</option>
+            <option value="goodwill">Cortesía / Good will</option>
+            <option value="purchase">Compra manual</option>
+            <option value="promo">Promoción</option>
+          </select></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-sm btn-success" style="flex:1" onclick="adminAddCredits()">+ Agregar Créditos</button>
+          <button class="btn-sm btn-danger" style="flex:1" onclick="adminRemoveCredits()">− Quitar Créditos</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error review queue -->
+    <div class="card">
+      <div class="card-hd">Cola de errores pendientes — revisión de dimensiones</div>
+      <div id="error-queue">
+        <div class="error-step">
+          <div class="error-header">
+            <div class="error-badge">⚠️ Error de dimensión</div>
+            <div class="error-title">Excavación — Demo Owner</div>
+          </div>
+          <div class="error-desc">
+            El sistema detectó que la profundidad del basement (15 ft) podría estar fuera del rango estándar para zona residencial (máx 12 ft en Texas). Intentos del Owner: 1/3.<br><br>
+            <strong>Dimensión reportada:</strong> Largo 50ft × Ancho 40ft × Profundidad <span style="color:var(--red)">15 ft</span><br>
+            <strong>Rango estándar:</strong> 7–12 ft para basement residencial USA
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn-sm btn-success" onclick="resolveError(this,'approve')">✅ Aprobar — el Owner confirma que es correcto</button>
+            <button class="btn-sm btn-danger" onclick="resolveError(this,'fix')">🔧 Corregir a 9 ft (estándar) y notificar Owner</button>
+            <button class="btn-sm btn-muted" onclick="resolveError(this,'refund')">💰 Reembolsar 5🪙 y solicitar nuevas medidas</button>
+          </div>
+        </div>
+        <div style="padding:16px;text-align:center;font-family:var(--mono);font-size:.72rem;color:var(--muted)" id="no-errors-msg" style="display:none">✅ No hay errores pendientes de revisión</div>
+      </div>
+    </div>
+
+    <!-- Engineer approval queue -->
+    <div class="card" style="margin-top:14px">
+      <div class="card-hd">Cola de aprobaciones — ingeniero</div>
+      <div class="approval-section">
+        <div class="ap-title">Estimados pendientes de revisión del ingeniero</div>
+        <div class="ap-item">
+          <div class="ap-dot ap-dot-ok"></div>
+          <div class="ap-name">Andamios — Casa Oak St · 40×22ft</div>
+          <div class="ap-status ap-status-ok">Aprobado ✓</div>
+        </div>
+        <div class="ap-item">
+          <div class="ap-dot" style="background:var(--amber);box-shadow:0 0 6px rgba(255,140,0,.5)"></div>
+          <div class="ap-name">Excavación — Proyecto Riverside · 50×40ft · 15ft deep</div>
+          <div class="ap-status" style="color:var(--amber)">Bajo revisión ⏳</div>
+        </div>
+        <div class="ap-item">
+          <div class="ap-dot ap-dot-wait"></div>
+          <div class="ap-name">Cimentación — Pendiente de estimado</div>
+          <div class="ap-status ap-status-wait">En espera</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ANDAMIOS ══ -->
+<div class="sec" id="sec-scaff">
+  <div class="ph">
+    <div><div class="ph-title">🏗️ <em>Andamios</em></div><div class="ph-sub">// frames, plataformas, puntales, ormaletas</div></div>
+    <div class="ph-badge phb-free">✅ GRATIS</div>
+  </div>
+  <div class="admin-edit-bar" id="aeb-scaff">
+    <span class="aeb-icon">⚙️</span>
+    <span>Modo Admin — puedes editar dimensiones directamente sin restricciones</span>
+    <button class="aeb-unlock" onclick="unlockFields('scaff')">🔓 Desbloquear edición</button>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-hd">Dimensiones de la fachada</div>
+      <div class="fl2"><label>Ancho (pies)</label><input class="fi" type="number" id="sc-w" value="40" onchange="validateDim('sc-w',5,300)"><div class="fh">Casa suburbana típica = 35–45 ft</div></div>
+      <div class="fl2"><label>Alto (pies)</label><input class="fi" type="number" id="sc-h" value="22" onchange="validateDim('sc-h',6,120)"><div class="fh">2 pisos ≈ 18–24ft · 3 pisos ≈ 28–32ft</div></div>
+      <div class="fl2"><label>Tipo de trabajo</label>
+        <select class="fi" id="sc-type"><option value="brick">Fachada de ladrillo / Brick</option><option value="paint">Pintura exterior</option><option value="stucco">Estuco</option><option value="window">Instalación de ventanas</option><option value="repair">Reparaciones</option></select></div>
+      <div id="sc-dim-warn"></div>
+    </div>
+    <div class="card">
+      <div class="card-hd">Parámetros financieros</div>
+      <div class="fl2"><label>Renta por frame / semana ($)</label><input class="fi" type="number" id="sc-rate" value="35"></div>
+      <div class="fl2"><label>Semanas estimadas</label><input class="fi" type="number" id="sc-weeks" value="2"></div>
+      <div class="fl2"><label>Tu margen de ganancia (%)</label><input class="fi" type="number" id="sc-margin" value="30"></div>
+      <button class="btn-go" onclick="calcScaff()">⚙️ CALCULAR ESTIMADO</button>
+    </div>
+  </div>
+  <div class="res" id="sc-res">
+    <div class="metrics" id="sc-mets"></div>
+    <div class="card" style="margin-bottom:12px"><table class="tbl"><thead><tr><th>Material</th><th>Cantidad</th><th>Unidad</th><th>Referencia</th></tr></thead><tbody id="sc-tbl"></tbody></table></div>
+    <div class="pbox"><div><div class="pl">Costo base (renta)</div><div class="pv" id="sc-cost">$0</div><div class="pn">lo que tú pagas</div></div><div style="text-align:right"><div class="pl">Precio al Client</div><div class="pv" style="color:var(--green)" id="sc-client">$0</div><div class="pn">incluye tu margen</div></div></div>
+    <!-- ADMIN ONLY: Margin breakdown -->
+    <div class="margin-panel" id="sc-margin-panel">
+      <div class="mp-title">⚙️ Vista Admin — Desglose de margen (oculto al Client)</div>
+      <div class="mp-row"><span class="mp-label">Costo real de renta</span><span class="mp-val" id="sc-mp-cost">$0</span></div>
+      <div class="mp-row"><span class="mp-label">Precio al Client</span><span class="mp-val" id="sc-mp-client">$0</span></div>
+      <div class="mp-row"><span class="mp-label">Margen aplicado</span><span class="mp-val" id="sc-mp-pct">0%</span></div>
+      <div class="mp-row"><span class="mp-label">Tu ganancia neta</span><span class="mp-profit" id="sc-mp-profit">$0</span></div>
+    </div>
+    <div class="note" id="sc-note"></div>
+    <div id="sc-approval" class="approval-section" style="display:none">
+      <div class="ap-title">Estado de aprobación</div>
+      <div class="ap-item"><div class="ap-dot ap-dot-ok"></div><div class="ap-name">Calculado por Admin</div><div class="ap-status ap-status-ok">Completo ✓</div></div>
+      <div class="ap-item" id="sc-eng-approval"><div class="ap-dot ap-dot-wait"></div><div class="ap-name">Revisión del Ingeniero</div><div class="ap-status ap-status-wait">Pendiente</div></div>
+    </div>
+    <div class="disc">⚠️ Estimado rápido (±15%). Verificar en campo. Confirmar con ingeniero antes del precio final.</div>
+  </div>
+</div>
+
+<!-- ══ EXCAVACION ══ -->
+<div class="sec" id="sec-exc">
+  <div class="ph">
+    <div><div class="ph-title">⛏️ <em>Excavación</em></div><div class="ph-sub">// basement, retroexcavadora, volumen de corte</div></div>
+    <div class="ph-badge phb-cost">🪙 5 CRÉDITOS</div>
+  </div>
+  <div class="admin-edit-bar" id="aeb-exc"><span class="aeb-icon">⚙️</span><span>Modo Admin — edición directa sin validación</span><button class="aeb-unlock" onclick="unlockFields('exc')">🔓 Desbloquear</button></div>
+  <div class="al al-warn">⚠️ Este módulo consume <strong>5 créditos</strong> por estimado. Saldo: <strong id="exc-bal">0</strong> 🪙</div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-hd">Dimensiones del basement</div>
+      <div class="fl2"><label>Largo exterior (pies)</label><input class="fi" type="number" id="ex-len" value="50" onchange="validateDim('ex-len',10,500)"></div>
+      <div class="fl2"><label>Ancho exterior (pies)</label><input class="fi" type="number" id="ex-wid" value="40" onchange="validateDim('ex-wid',10,300)"></div>
+      <div class="fl2"><label>Profundidad del basement (pies)</label><input class="fi" type="number" id="ex-dep" value="8" onchange="validateDim('ex-dep',3,12,'La profundidad típica de basement residencial es 7–12 ft. ¿Estás seguro de esta medida?')"><div class="fh">Estándar: 8 ft · Full: 9 ft · Crawl: 3–4 ft</div></div>
+      <div class="fl2"><label>Espacio de trabajo extra c/lado (pies)</label><input class="fi" type="number" id="ex-ext" value="3"></div>
+      <div id="ex-dim-warn"></div>
+    </div>
+    <div class="card">
+      <div class="card-hd">Suelo y equipo</div>
+      <div class="fl2"><label>Tipo de suelo</label>
+        <select class="fi" id="ex-soil"><option value="1.0">Tierra suelta / Sandy (×1.00)</option><option value="1.15" selected>Tierra compacta / Clay (×1.15)</option><option value="1.30">Clay duro (×1.30)</option><option value="1.50">Grava / Gravel (×1.50)</option><option value="2.00">Roca blanda (×2.00)</option></select></div>
+      <div class="fl2"><label>Costo retroexcavadora ($/hr con operador)</label><input class="fi" type="number" id="ex-eq" value="150"></div>
+      <div class="fl2"><label>Costo camión disposal ($/viaje)</label><input class="fi" type="number" id="ex-truck" value="85"></div>
+      <div class="fl2"><label>Tu margen (%)</label><input class="fi" type="number" id="ex-margin" value="20"></div>
+      <button class="btn-go" onclick="calcExc()">⚙️ CALCULAR (consume 5🪙)</button>
+    </div>
+  </div>
+  <div class="res" id="ex-res">
+    <div class="metrics" id="ex-mets"></div>
+    <div class="card" style="margin-bottom:12px"><table class="tbl"><thead><tr><th>Concepto</th><th>Cantidad</th><th>Unidad</th><th>Costo base</th></tr></thead><tbody id="ex-tbl"></tbody></table></div>
+    <div class="pbox"><div><div class="pl">Costo directo</div><div class="pv" id="ex-cost">$0</div><div class="pn">equipo + disposal</div></div><div style="text-align:right"><div class="pl">Precio al Client</div><div class="pv" style="color:var(--green)" id="ex-client">$0</div><div class="pn">incluye margen</div></div></div>
+    <div class="margin-panel" id="ex-margin-panel">
+      <div class="mp-title">⚙️ Vista Admin — Desglose de margen</div>
+      <div class="mp-row"><span class="mp-label">Costo directo (equipo+camiones)</span><span class="mp-val" id="ex-mp-cost">$0</span></div>
+      <div class="mp-row"><span class="mp-label">Precio al Client</span><span class="mp-val" id="ex-mp-client">$0</span></div>
+      <div class="mp-row"><span class="mp-label">Margen aplicado</span><span class="mp-val" id="ex-mp-pct">0%</span></div>
+      <div class="mp-row"><span class="mp-label">Tu ganancia neta</span><span class="mp-profit" id="ex-mp-profit">$0</span></div>
+    </div>
+    <div class="note" id="ex-note"></div>
+    <div class="disc">⚠️ Requiere soil test para precisión real. Confirmar con ingeniero.</div>
+  </div>
+</div>
+
+<!-- ══ CIMENTACION ══ -->
+<div class="sec" id="sec-found">
+  <div class="ph">
+    <div><div class="ph-title">🧱 <em>Cimentación</em></div><div class="ph-sub">// footings, foundation walls, losa, concreto, varilla</div></div>
+    <div class="ph-badge phb-cost">🪙 10 CRÉDITOS</div>
+  </div>
+  <div class="admin-edit-bar" id="aeb-found"><span class="aeb-icon">⚙️</span><span>Modo Admin — edición directa sin validación</span><button class="aeb-unlock" onclick="unlockFields('found')">🔓 Desbloquear</button></div>
+  <div class="al al-warn">⚠️ Este módulo consume <strong>10 créditos</strong>. Saldo: <strong id="found-bal">0</strong> 🪙</div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-hd">Dimensiones del foundation</div>
+      <div class="fl2"><label>Perímetro total (pies)</label><input class="fi" type="number" id="fo-per" value="180" onchange="validateDim('fo-per',40,2000)"><div class="fh">Casa 50×40ft → perímetro = 180 ft</div></div>
+      <div class="fl2"><label>Altura de foundation wall (pies)</label><input class="fi" type="number" id="fo-h" value="8" onchange="validateDim('fo-h',2,14)"><div class="fh">Estándar: 8 ft · Varía por código local</div></div>
+      <div class="fl2"><label>Grosor de la pared (pulgadas)</label><input class="fi" type="number" id="fo-thick" value="10"><div class="fh">Poured concrete: 8–12" · Block: 8" o 12"</div></div>
+      <div class="fl2"><label>Área total del piso (sq ft)</label><input class="fi" type="number" id="fo-area" value="2000"><div class="fh">Para calcular losa del slab</div></div>
+      <div class="fl2"><label>Tipo de foundation</label>
+        <select class="fi" id="fo-type"><option value="poured">Poured Concrete</option><option value="block">Concrete Block (CMU)</option><option value="slab">Slab on Grade</option></select></div>
+    </div>
+    <div class="card">
+      <div class="card-hd">Materiales y precios</div>
+      <div class="fl2"><label>Precio concreto ($/yd³)</label><input class="fi" type="number" id="fo-conc-price" value="165"><div class="fh">Varía por estado: TX=$140–180 · CA=$180–220</div></div>
+      <div class="fl2"><label>Precio varilla rebar ($/lb)</label><input class="fi" type="number" id="fo-rebar-price" value="0.85"></div>
+      <div class="fl2"><label>Precio waterproofing ($/sq ft)</label><input class="fi" type="number" id="fo-wp-price" value="2.50"></div>
+      <div class="fl2"><label>Tu margen (%)</label><input class="fi" type="number" id="fo-margin" value="20"></div>
+      <button class="btn-go" onclick="calcFound()">⚙️ CALCULAR (consume 10🪙)</button>
+    </div>
+  </div>
+  <div class="res" id="fo-res">
+    <div class="metrics" id="fo-mets"></div>
+    <div class="card" style="margin-bottom:12px"><table class="tbl"><thead><tr><th>Material</th><th>Cantidad</th><th>Unidad</th><th>Costo base</th></tr></thead><tbody id="fo-tbl"></tbody></table></div>
+    <div class="pbox"><div><div class="pl">Costo materiales</div><div class="pv" id="fo-cost">$0</div></div><div style="text-align:right"><div class="pl">Precio al Client</div><div class="pv" style="color:var(--green)" id="fo-client">$0</div></div></div>
+    <div class="margin-panel" id="fo-margin-panel">
+      <div class="mp-title">⚙️ Vista Admin — Desglose de margen</div>
+      <div class="mp-row"><span class="mp-label">Costo real materiales</span><span class="mp-val" id="fo-mp-cost">$0</span></div>
+      <div class="mp-row"><span class="mp-label">Precio al Client</span><span class="mp-val" id="fo-mp-client">$0</span></div>
+      <div class="mp-row"><span class="mp-label">Tu ganancia neta</span><span class="mp-profit" id="fo-mp-profit">$0</span></div>
+    </div>
+    <div class="note" id="fo-note"></div>
+    <div class="disc">⚠️ No incluye mano de obra de cimentación. Usar módulo Mano de Obra por separado.</div>
+  </div>
+</div>
+
+<!-- ══ ESTRUCTURA ══ -->
+<div class="sec" id="sec-struct">
+  <div class="ph">
+    <div><div class="ph-title">🏠 <em>Estructura</em></div><div class="ph-sub">// framing, lumber, techo, ventanas, puertas</div></div>
+    <div class="ph-badge phb-cost">🪙 15 CRÉDITOS</div>
+  </div>
+  <div class="admin-edit-bar" id="aeb-struct"><span class="aeb-icon">⚙️</span><span>Modo Admin — edición directa sin validación</span><button class="aeb-unlock" onclick="unlockFields('struct')">🔓 Desbloquear</button></div>
+  <div class="al al-warn">⚠️ Este módulo consume <strong>15 créditos</strong>. Saldo: <strong id="struct-bal">0</strong> 🪙</div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-hd">Dimensiones de la estructura</div>
+      <div class="fl2"><label>Área habitable (sq ft)</label><input class="fi" type="number" id="st-area" value="2000"><div class="fh">Casa típica suburbana: 1,500–3,000 sq ft</div></div>
+      <div class="fl2"><label>Número de pisos</label><select class="fi" id="st-floors"><option value="1">1 piso</option><option value="2" selected>2 pisos</option><option value="3">3 pisos</option></select></div>
+      <div class="fl2"><label>Altura por piso (pies)</label><input class="fi" type="number" id="st-flh" value="9"><div class="fh">Estándar: 9 ft · Premium: 10 ft</div></div>
+      <div class="fl2"><label>Tipo de techo</label><select class="fi" id="st-roof"><option value="gable">Gable (2 aguas)</option><option value="hip">Hip roof (4 aguas)</option><option value="flat">Flat / Low slope</option></select></div>
+      <div class="fl2"><label>Pitch del techo (x:12)</label><input class="fi" type="number" id="st-pitch" value="6"><div class="fh">6:12 es típico · más bajo = flat, más alto = steep</div></div>
+    </div>
+    <div class="card">
+      <div class="card-hd">Ventanas, puertas y precios</div>
+      <div class="fl2"><label>Número de ventanas</label><input class="fi" type="number" id="st-wins" value="12"></div>
+      <div class="fl2"><label>Número de puertas ext.</label><input class="fi" type="number" id="st-doors" value="3"></div>
+      <div class="fl2"><label>Precio lumber ($/board foot)</label><input class="fi" type="number" id="st-lum-price" value="1.20"><div class="fh">Varía: TX≈$1.00–1.40 · CA≈$1.30–1.80</div></div>
+      <div class="fl2"><label>Precio ventana promedio ($)</label><input class="fi" type="number" id="st-win-price" value="350"></div>
+      <div class="fl2"><label>Tu margen (%)</label><input class="fi" type="number" id="st-margin" value="20"></div>
+      <button class="btn-go" onclick="calcStruct()">⚙️ CALCULAR (consume 15🪙)</button>
+    </div>
+  </div>
+  <div class="res" id="st-res">
+    <div class="metrics" id="st-mets"></div>
+    <div class="card" style="margin-bottom:12px"><table class="tbl"><thead><tr><th>Componente</th><th>Cantidad</th><th>Unidad</th><th>Costo base</th></tr></thead><tbody id="st-tbl"></tbody></table></div>
+    <div class="pbox"><div><div class="pl">Costo materiales estructura</div><div class="pv" id="st-cost">$0</div></div><div style="text-align:right"><div class="pl">Precio al Client</div><div class="pv" style="color:var(--green)" id="st-client">$0</div></div></div>
+    <div class="margin-panel" id="st-margin-panel">
+      <div class="mp-title">⚙️ Vista Admin — Desglose de margen</div>
+      <div class="mp-row"><span class="mp-label">Costo real materiales</span><span class="mp-val" id="st-mp-cost">$0</span></div>
+      <div class="mp-row"><span class="mp-label">Precio al Client</span><span class="mp-val" id="st-mp-client">$0</span></div>
+      <div class="mp-row"><span class="mp-label">Tu ganancia neta</span><span class="mp-profit" id="st-mp-profit">$0</span></div>
+    </div>
+    <div class="note" id="st-note"></div>
+  </div>
+</div>
+
+<!-- ══ MANO DE OBRA ══ -->
+<div class="sec" id="sec-labor">
+  <div class="ph">
+    <div><div class="ph-title">👷 <em>Mano de Obra</em></div><div class="ph-sub">// salario por estado · prevailing wage · overtime</div></div>
+    <div class="ph-badge phb-cost">🪙 8 CRÉDITOS</div>
+  </div>
+  <div class="admin-edit-bar" id="aeb-labor"><span class="aeb-icon">⚙️</span><span>Modo Admin — edición directa sin validación</span><button class="aeb-unlock" onclick="unlockFields('labor')">🔓 Desbloquear</button></div>
+  <div class="al al-warn">⚠️ Consume <strong>8 créditos</strong>. Saldo: <strong id="labor-bal">0</strong> 🪙</div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-hd">Proyecto y ubicación</div>
+      <div class="fl2"><label>Estado (USA)</label>
+        <select class="fi" id="la-state" onchange="updateWages()">
+          <option value="TX">Texas</option><option value="FL">Florida</option><option value="CA">California</option>
+          <option value="NY">New York</option><option value="GA">Georgia</option><option value="AZ">Arizona</option>
+          <option value="NC">North Carolina</option><option value="OH">Ohio</option><option value="IL">Illinois</option>
+          <option value="WA">Washington</option><option value="CO">Colorado</option><option value="NV">Nevada</option>
+        </select></div>
+      <div class="fl2"><label>Tipo de proyecto</label>
+        <select class="fi" id="la-type"><option value="residential">Residencial</option><option value="commercial">Comercial</option><option value="government">Gobierno (Prevailing Wage)</option></select></div>
+      <div class="fl2"><label>Área total de trabajo (sq ft)</label><input class="fi" type="number" id="la-area" value="2000"></div>
+      <div class="fl2"><label>Número de trabajadores</label><input class="fi" type="number" id="la-workers" value="4"></div>
+      <div class="fl2"><label>Días de trabajo estimados</label><input class="fi" type="number" id="la-days" value="30"></div>
+    </div>
+    <div class="card">
+      <div class="card-hd">Salarios por estado (auto-actualizado)</div>
+      <div class="al al-info" id="wage-info" style="margin-bottom:10px">Selecciona un estado para ver los salarios vigentes.</div>
+      <div class="fl2"><label>Salario mínimo estatal ($/hr)</label><input class="fi" type="number" id="la-min-wage" readonly></div>
+      <div class="fl2"><label>Salario estándar construcción ($/hr)</label><input class="fi" type="number" id="la-std-wage"></div>
+      <div class="fl2"><label>Horas por día</label><input class="fi" type="number" id="la-hrs" value="8"></div>
+      <div class="fl2"><label>Overtime después de (hrs/semana)</label><input class="fi" type="number" id="la-ot-thresh" value="40"></div>
+      <div class="fl2"><label>Tu margen (%)</label><input class="fi" type="number" id="la-margin" value="15"></div>
+      <button class="btn-go" onclick="calcLabor()">⚙️ CALCULAR (consume 8🪙)</button>
+    </div>
+  </div>
+  <div class="res" id="la-res">
+    <div class="metrics" id="la-mets"></div>
+    <div class="card" style="margin-bottom:12px"><table class="tbl"><thead><tr><th>Concepto</th><th>Detalle</th><th>Costo base</th></tr></thead><tbody id="la-tbl"></tbody></table></div>
+    <div class="pbox"><div><div class="pl">Costo de mano de obra</div><div class="pv" id="la-cost">$0</div></div><div style="text-align:right"><div class="pl">Precio al Client</div><div class="pv" style="color:var(--green)" id="la-client">$0</div></div></div>
+    <div class="margin-panel" id="la-margin-panel">
+      <div class="mp-title">⚙️ Vista Admin — Desglose de margen</div>
+      <div class="mp-row"><span class="mp-label">Costo real labor</span><span class="mp-val" id="la-mp-cost">$0</span></div>
+      <div class="mp-row"><span class="mp-label">Precio al Client</span><span class="mp-val" id="la-mp-client">$0</span></div>
+      <div class="mp-row"><span class="mp-label">Tu ganancia neta</span><span class="mp-profit" id="la-mp-profit">$0</span></div>
+    </div>
+    <div class="note" id="la-note"></div>
+    <div class="disc">⚠️ Verificar regulaciones laborales locales. Para proyectos de gobierno, confirmar prevailing wage con el Department of Labor del estado.</div>
+  </div>
+</div>
+
+<!-- ══ REPORTE CLIENTE ══ -->
+<div class="sec" id="sec-report">
+  <div class="ph">
+    <div><div class="ph-title">📄 Reporte <em>Client</em></div><div class="ph-sub">// documento limpio — el Owner no ve los cálculos internos</div></div>
+    <div class="ph-badge phb-cost">🪙 3 CRÉDITOS</div>
+  </div>
+  <div class="al al-info">El Client ve solo precios por etapa. No hay mención de software, fórmulas ni márgenes internos.</div>
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-hd">Información del proyecto</div>
+    <div class="g2">
+      <div class="fl2"><label>Nombre del Client</label><input class="fi" type="text" id="rp-name" placeholder="John Smith"></div>
+      <div class="fl2"><label>Dirección del proyecto</label><input class="fi" type="text" id="rp-addr" placeholder="123 Oak St, Houston TX"></div>
+      <div class="fl2"><label>Estado</label><select class="fi" id="rp-state"><option>Texas</option><option>Florida</option><option>California</option><option>New York</option><option>Georgia</option><option>Arizona</option></select></div>
+      <div class="fl2"><label>Fecha estimada de inicio</label><input class="fi" type="date" id="rp-date"></div>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-hd">Etapas — marca y ajusta precios</div>
+    <table class="tbl" style="margin-bottom:12px">
+      <thead><tr><th>✓</th><th>Etapa</th><th>Descripción</th><th>Precio ($)</th></tr></thead>
+      <tbody>
+        <tr><td><input type="checkbox" id="rc-exc" checked style="accent-color:var(--gold)"></td><td>1. Excavación</td><td class="tu">Movimiento de tierra, basement</td><td><input class="fi" type="number" id="rv-exc" value="4500" style="width:110px;padding:4px 8px"></td></tr>
+        <tr><td><input type="checkbox" id="rc-found" checked style="accent-color:var(--gold)"></td><td>2. Cimentación</td><td class="tu">Footings, foundation walls, losa</td><td><input class="fi" type="number" id="rv-found" value="12000" style="width:110px;padding:4px 8px"></td></tr>
+        <tr><td><input type="checkbox" id="rc-struct" checked style="accent-color:var(--gold)"></td><td>3. Estructura</td><td class="tu">Framing, paredes, techo</td><td><input class="fi" type="number" id="rv-struct" value="35000" style="width:110px;padding:4px 8px"></td></tr>
+        <tr><td><input type="checkbox" id="rc-scaff" checked style="accent-color:var(--gold)"></td><td>4. Andamios</td><td class="tu">Fachada exterior, acceso</td><td><input class="fi" type="number" id="rv-scaff" value="2200" style="width:110px;padding:4px 8px"></td></tr>
+        <tr><td><input type="checkbox" id="rc-labor" style="accent-color:var(--gold)"></td><td>5. Mano de obra</td><td class="tu">Labor total estimado</td><td><input class="fi" type="number" id="rv-labor" value="22000" style="width:110px;padding:4px 8px"></td></tr>
+        <tr><td><input type="checkbox" id="rc-ext" style="accent-color:var(--gold)"></td><td>6. Acabados ext.</td><td class="tu">Brick, ventanas, puertas</td><td><input class="fi" type="number" id="rv-ext" value="18000" style="width:110px;padding:4px 8px"></td></tr>
+      </tbody>
+    </table>
+    <button class="btn-go" onclick="genReport()">📄 GENERAR REPORTE (consume 3🪙)</button>
+  </div>
+  <div class="res" id="rp-res">
+    <div id="rp-preview" style="background:#fff;color:#1a1a1a;border-radius:12px;padding:32px;max-width:660px;font-family:sans-serif;line-height:1.5"></div>
+    <div style="text-align:center;margin-top:12px"><button class="btn-go" style="max-width:260px;margin:0 auto;display:block" onclick="doPrint()">🖨️ IMPRIMIR / PDF</button></div>
+  </div>
+</div>
+
+<!-- ══ REPORTE INGENIERO ══ -->
+<div class="sec" id="sec-eng-rep">
+  <div class="ph">
+    <div><div class="ph-title">📐 Reporte <em>Ingeniero</em></div><div class="ph-sub">// versión técnica completa · fórmulas · normas OSHA/IBC</div></div>
+    <div class="ph-badge phb-cost">🪙 5 CRÉDITOS</div>
+  </div>
+  <div class="al al-warn">Este reporte incluye todos los cálculos técnicos y referencias normativas para verificación independiente.</div>
+  <div class="card" style="margin-bottom:12px"><div class="card-hd">01 — Datos generales</div>
+    <table class="tbl"><tbody>
+      <tr><td style="color:var(--muted);width:180px">Proyecto</td><td class="tv">Residencia unifamiliar — Activo</td></tr>
+      <tr><td style="color:var(--muted)">Estándar</td><td class="tv">IBC 2021 · Residential Code 2021</td></tr>
+      <tr><td style="color:var(--muted)">Sistema</td><td class="tv">Imperial (ft, in, yd³, lb, bf)</td></tr>
+      <tr><td style="color:var(--muted)">Fecha</td><td class="tv" id="eng-date">—</td></tr>
+    </tbody></table></div>
+  <div class="card" style="margin-bottom:12px"><div class="card-hd">02 — Andamios · OSHA</div>
+    <table class="tbl"><thead><tr><th>Parámetro</th><th>Valor</th><th>Referencia</th></tr></thead><tbody>
+      <tr><td>Frames horizontales</td><td class="tv">8</td><td class="tu">40ft ÷ 5ft = 8 bays</td></tr>
+      <tr><td>Pisos de andamio</td><td class="tv">5</td><td class="tu">⌈22÷5⌉ = 5</td></tr>
+      <tr><td>Total frames</td><td class="tv">80</td><td class="tu">8×5×2 filas</td></tr>
+      <tr><td>Guardrails requeridos</td><td class="tv">✅ Sí</td><td class="tu">OSHA 29 CFR 1926.502 (>6ft)</td></tr>
+      <tr><td>Carga mínima requerida</td><td class="tv">25 psf</td><td class="tu">OSHA 29 CFR 1926.451(a)(1)</td></tr>
+    </tbody></table></div>
+  <div class="card" style="margin-bottom:12px"><div class="card-hd">03 — Excavación</div>
+    <table class="tbl"><thead><tr><th>Parámetro</th><th>Valor</th><th>Fórmula</th></tr></thead><tbody>
+      <tr><td>Área de excavación</td><td class="tv">2,444 sq ft</td><td class="tu">56×44 ft (incl. 3ft c/lado)</td></tr>
+      <tr><td>Volumen bruto</td><td class="tv">727 yd³</td><td class="tu">2444×8 ÷ 27</td></tr>
+      <tr><td>Factor esponjamiento</td><td class="tv">×1.15</td><td class="tu">ASTM D2487 · Clay</td></tr>
+      <tr><td>Volumen real</td><td class="tv">836 yd³</td><td class="tu">727 × 1.15</td></tr>
+      <tr><td>Viajes camión (14yd³)</td><td class="tv">60</td><td class="tu">⌈836÷14⌉</td></tr>
+    </tbody></table></div>
+  <div class="card"><div class="card-hd">04 — Notas para el ingeniero</div>
+    <div class="note">
+      <strong>VERIFICAR:</strong><br>
+      1. Soil report certificado (ASTM D2487) antes de aprobar factor de esponjamiento<br>
+      2. Llamar 811 (Call Before You Dig) — obligatorio USA antes de cualquier excavación<br>
+      3. Revisar setback requirements del township/county para la foundation<br>
+      4. Confirmar water table — puede afectar profundidad del basement<br>
+      5. Andamios: frames deben tener base plates — nunca directo al suelo (OSHA 1926.451)<br>
+      6. Foundation walls: verificar código local para grosor mínimo y rebar spacing<br><br>
+      <strong>PRECISIÓN:</strong> ±15% sin planos firmados · ±5% con planos de arquitecto + soil report
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+</div><!-- /shell -->
+</div><!-- /app-shell -->
+
+<script>
+// ════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════
+const APP = {
+  role: null, user: null,
+  credits: 125,
+  history: [{ico:'🎁',name:'Créditos de bienvenida',date:now(),delta:125,type:'pos'}],
+  errors: 0, maxErrors: 3,
+  selectedPkg: null,
+  owners: [{id:'demo_owner',name:'Demo Owner',credits:125,errors:0}]
+};
+
+const WAGES = {
+  TX:{min:7.25,std:22,label:'Texas — sin income tax'},
+  FL:{min:12.00,std:21,label:'Florida — min wage sube anualmente'},
+  CA:{min:16.00,std:32,label:'California — uno de los más altos del país'},
+  NY:{min:16.00,std:34,label:'New York City/State — muy variable por zona'},
+  GA:{min:7.25,std:20,label:'Georgia'},
+  AZ:{min:14.35,std:22,label:'Arizona'},
+  NC:{min:7.25,std:19,label:'North Carolina'},
+  OH:{min:10.45,std:21,label:'Ohio'},
+  IL:{min:14.00,std:26,label:'Illinois'},
+  WA:{min:16.28,std:35,label:'Washington — alta demanda de construcción'},
+  CO:{min:14.42,std:28,label:'Colorado'},
+  NV:{min:12.00,std:25,label:'Nevada'}
+};
+
+function now(){return new Date().toISOString().slice(0,16).replace('T',' ');}
+
+// ════════════════════════════════════════════
+// LOGIN
+// ════════════════════════════════════════════
+let selRole = null;
+function selectRole(el, role){
+  document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  selRole = role;
+  document.getElementById('pin-field').style.display = (role==='admin'||role==='engineer') ? 'block':'none';
+}
+
+function doLogin(){
+  const name = document.getElementById('login-name').value.trim();
+  const pin = document.getElementById('login-pin').value;
+  if(!name){toast('⚠️','Ingresa tu nombre','');return;}
+  if(!selRole){toast('⚠️','Selecciona un rol','');return;}
+  if(selRole==='admin' && pin!=='1234'){toast('❌','PIN incorrecto','Admin PIN: 1234');return;}
+  if(selRole==='engineer' && pin!=='5678'){toast('❌','PIN incorrecto','Engineer PIN: 5678');return;}
+  APP.role = selRole; APP.user = name;
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app-shell').style.display='block';
+  setupRoleUI();
+  refresh();
+  toast('👋','Bienvenido, '+name,'Sesión como '+(selRole==='admin'?'Admin':selRole==='engineer'?'Engineer':'Client'));
+}
+
+function doLogout(){
+  APP.role=null;APP.user=null;
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('app-shell').style.display='none';
+  document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('selected'));
+  selRole=null;
+  document.getElementById('login-name').value='';
+  document.getElementById('login-pin').value='';
+  document.getElementById('pin-field').style.display='none';
+}
+
+function setupRoleUI(){
+  const r=APP.role;
+  // Role chip
+  const chip=document.getElementById('role-chip');
+  chip.className='role-chip '+(r==='admin'?'rc-admin-chip':r==='engineer'?'rc-eng-chip':'rc-client-chip');
+  chip.textContent = r==='admin'?'⚙️ Admin':r==='engineer'?'📐 Engineer':'🏠 Client';
+  document.getElementById('top-username').textContent = APP.user;
+  document.getElementById('home-sub').textContent = '// '+APP.user+' · '+r;
+
+  // Admin edit bars — show only for admin
+  ['scaff','exc','found','struct','labor'].forEach(m=>{
+    const bar=document.getElementById('aeb-'+m);
+    if(bar) bar.classList.toggle('visible', r==='admin');
+  });
+
+  // Admin panel visibility
+  const adminLink = document.getElementById('nl-admin');
+  const adminBadge = document.getElementById('admin-badge');
+  if(r==='admin'){
+    adminLink.classList.remove('nl-dis');
+    adminBadge.className='np np-free';
+    document.getElementById('admin-locked-msg').style.display='none';
+    document.getElementById('admin-content').style.display='block';
+    renderOwnerList();
+  } else {
+    adminLink.classList.add('nl-dis');
+  }
+}
+
+// ════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════
+const SECS=['home','credits','admin','scaff','exc','found','struct','labor','report','eng-rep'];
+function navTo(id){
+  if(id==='admin' && APP.role!=='admin'){toast('🔒','Acceso restringido','Solo para Admins');return;}
+  SECS.forEach(s=>{
+    document.getElementById('sec-'+s)?.classList.remove('sa');
+    document.getElementById('nl-'+s)?.classList.remove('nla');
+  });
+  document.getElementById('sec-'+id)?.classList.add('sa');
+  document.getElementById('nl-'+id)?.classList.add('nla');
+  window.scrollTo({top:0,behavior:'smooth'});
+  refresh();
+}
+
+// ════════════════════════════════════════════
+// CREDIT SYSTEM
+// ════════════════════════════════════════════
+function refresh(){
+  document.getElementById('top-credits').textContent = APP.credits;
+  document.getElementById('credits-hero-num').textContent = APP.credits+' 🪙';
+  ['exc-bal','found-bal','struct-bal','labor-bal'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.textContent=APP.credits;
+  });
+  const pill=document.getElementById('credit-pill');
+  pill.classList.toggle('low', APP.credits<15);
+  renderCreditWarning();
+  renderHistory();
+}
+
+function renderCreditWarning(){
+  const warn = APP.credits < 20;
+  const html = warn ? `
+    <div class="credit-warning">
+      <div class="cw-icon">${APP.credits<5?'🚨':'⚠️'}</div>
+      <div class="cw-bar">
+        <div class="cw-title">${APP.credits<5?'¡CRÉDITOS CRÍTICOS!':'Créditos bajos'}</div>
+        <div class="cw-msg">Tienes <strong>${APP.credits} créditos</strong>. ${APP.credits<5?'No puedes generar estimados de pago hasta recargar.':'Te quedan pocos estimados de pago disponibles.'} Recarga para continuar sin interrupciones.</div>
+        <div class="cw-progress"><div class="cw-fill" style="width:${Math.min(APP.credits/20*100,100)}%"></div></div>
+      </div>
+      <div class="cw-btn"><button class="btn-go" style="padding:10px 16px;font-size:.8rem" onclick="navTo('credits')">+ Recargar</button></div>
+    </div>` : '';
+  ['credit-warning-home','credit-warning-credits'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.innerHTML=html;
+  });
+}
+
+function spendCredits(amount, label){
+  if(APP.credits < amount){
+    showModal('❌','Créditos insuficientes',
+      `Necesitas <strong>${amount} créditos</strong> para este módulo.<br>Tu saldo actual: <strong>${APP.credits} 🪙</strong><br><br>Recarga para continuar.`,
+      [{label:'Recargar créditos',cls:'btn-success',fn:()=>{closeModal();navTo('credits');}}]
+    );
+    return false;
+  }
+  APP.credits -= amount;
+  addHistory('🔧',label,amount,'neg');
+  toast('🪙',`-${amount} créditos usados`,`Saldo: ${APP.credits} 🪙`);
+  refresh();
+  return true;
+}
+
+function refundCredits(amount, reason){
+  APP.credits += amount;
+  addHistory('💰',`Reembolso: ${reason}`,amount,'pos');
+  toast('💰',`+${amount} créditos reembolsados`,reason);
+  refresh();
+}
+
+// ── Packages
+let selPkg=null;
+function selectPkg(el,coins,price,tier){
+  document.querySelectorAll('.pkg').forEach(p=>p.classList.remove('pkg-sel'));
+  el.classList.add('pkg-sel');
+  selPkg={coins,price,tier};
+  const btn=document.getElementById('btn-buy');
+  btn.classList.add('vis');
+  btn.textContent=`AGREGAR ${coins} CRÉDITOS — $${price.toFixed(2)} →`;
+}
+function doBuy(){
+  if(!selPkg)return;
+  APP.credits+=selPkg.coins;
+  addHistory('🪙',`Compra — Paquete ${selPkg.tier}`,selPkg.coins,'pos');
+  toast('🪙',`+${selPkg.coins} créditos agregados`,`Nuevo saldo: ${APP.credits} 🪙`);
+  refresh();
+  document.querySelectorAll('.pkg').forEach(p=>p.classList.remove('pkg-sel'));
+  document.getElementById('btn-buy').classList.remove('vis');
+  selPkg=null;
+}
+
+function addHistory(ico,name,delta,type){
+  APP.history.push({ico,name,date:now(),delta,type});
+}
+function renderHistory(){
+  const list=document.getElementById('hist-list');
+  if(!APP.history.length){list.innerHTML='<div style="padding:20px;text-align:center;font-family:var(--mono);font-size:.72rem;color:var(--muted)">Sin transacciones</div>';return;}
+  list.innerHTML=[...APP.history].reverse().slice(0,20).map(h=>`
+    <div class="hi">
+      <div class="hi-ico">${h.ico}</div>
+      <div class="hi-info"><div class="hi-name">${h.name}</div><div class="hi-date">${h.date}</div></div>
+      <div class="hi-d ${h.type==='pos'?'hd-pos':h.type==='neg'?'hd-neg':'hd-free'}">${h.type==='pos'?'+':h.type==='neg'?'-':''}${Math.abs(h.delta)} ${h.type==='free'?'(gratis)':'🪙'}</div>
+    </div>`).join('');
+}
+
+// ════════════════════════════════════════════
+// DIMENSION VALIDATION
+// ════════════════════════════════════════════
+function validateDim(id, min, max, customMsg){
+  const val=+document.getElementById(id).value;
+  const warnId=id.split('-')[0]+'-dim-warn';
+  const warnEl=document.getElementById(warnId);
+  if(!warnEl)return true;
+  if(val<min||val>max){
+    const msg=customMsg||`El valor ${val} está fuera del rango típico (${min}–${max} ft). ¿Estás seguro?`;
+    APP.errors++;
+    warnEl.innerHTML=`<div class="al al-warn" style="margin-top:8px">⚠️ ${msg} <button class="btn-sm btn-muted" style="margin-left:8px;padding:3px 10px" onclick="this.parentElement.parentElement.innerHTML=''">Confirmar</button></div>`;
+    if(APP.errors>=APP.maxErrors){
+      showModal('⚠️','Límite de correcciones alcanzado',
+        `Has tenido ${APP.errors} dimensiones fuera del rango estándar.<br><br>
+        ¿Deseas que el <strong>Admin revise y corrija</strong> las medidas, o prefieres confirmar que todas son correctas?`,
+        [
+          {label:'✅ Confirmar — mis medidas son correctas',cls:'btn-success',fn:()=>{APP.errors=0;closeModal();}},
+          {label:'📋 Notificar al Admin',cls:'btn-muted',fn:()=>{toast('📋','Notificación enviada al Admin','El Admin revisará las dimensiones');closeModal();}}
+        ]
+      );
+    }
+    return false;
+  }
+  warnEl.innerHTML='';
+  return true;
+}
+
+// ════════════════════════════════════════════
+// MODAL
+// ════════════════════════════════════════════
+function showModal(ico,title,body,actions){
+  document.getElementById('m-ico').textContent=ico;
+  document.getElementById('m-title').textContent=title;
+  document.getElementById('m-body').innerHTML=body;
+  document.getElementById('m-actions').innerHTML=actions.map(a=>
+    `<button class="btn-sm ${a.cls}" onclick="(${a.fn.toString()})()">${a.label}</button>`
+  ).join('');
+  document.getElementById('modal').classList.remove('hidden');
+}
+function closeModal(){document.getElementById('modal').classList.add('hidden');}
+document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+
+// ════════════════════════════════════════════
+// ADMIN
+// ════════════════════════════════════════════
+function renderOwnerList(){
+  document.getElementById('owner-list').innerHTML=APP.owners.map(o=>`
+    <div class="owner-card">
+      <div class="oc-avatar oc-av-client">🏠</div>
+      <div class="oc-info"><div class="oc-name">${o.name}</div><div class="oc-meta">Errores: ${o.errors}/${APP.maxErrors} · ID: ${o.id}</div></div>
+      <div class="oc-credits">${o.credits}🪙</div>
+    </div>`).join('');
+}
+function adminAddCredits(){
+  const amt=+document.getElementById('adj-amount').value||0;
+  const reason=document.getElementById('adj-reason').options[document.getElementById('adj-reason').selectedIndex].text;
+  APP.credits+=amt;
+  addHistory('⚙️',`Admin: ${reason}`,amt,'pos');
+  toast('⚙️',`+${amt} créditos ajustados`,reason);
+  refresh();
+  renderOwnerList();
+}
+function adminRemoveCredits(){
+  const amt=+document.getElementById('adj-amount').value||0;
+  APP.credits=Math.max(0,APP.credits-amt);
+  addHistory('⚙️','Admin: deducción manual',amt,'neg');
+  toast('⚙️',`-${amt} créditos deducidos`,'Ajuste manual Admin');
+  refresh();
+}
+function resolveError(btn,action){
+  const card=btn.closest('.error-step');
+  const msgs={approve:'✅ Error aprobado — Owner confirmó que las medidas son correctas.',fix:'🔧 Dimensión corregida a valor estándar. Owner notificado.',refund:'💰 5 créditos reembolsados. Owner notificado para reenviar medidas.'};
+  if(action==='refund')refundCredits(5,'Error de dimensión — reembolso');
+  card.innerHTML=`<div class="al al-ok">${msgs[action]}</div>`;
+  toast('✅','Error resuelto','Cola de errores actualizada');
+}
+
+// ════════════════════════════════════════════
+// ADMIN: Unlock direct field editing
+// ════════════════════════════════════════════
+function unlockFields(module){
+  const bars = {
+    scaff: ['sc-w','sc-h','sc-rate','sc-weeks','sc-margin'],
+    exc:   ['ex-len','ex-wid','ex-dep','ex-ext','ex-eq','ex-truck','ex-margin'],
+    found: ['fo-per','fo-h','fo-thick','fo-area','fo-conc-price','fo-rebar-price','fo-wp-price','fo-margin'],
+    struct:['st-area','st-flh','st-pitch','st-wins','st-doors','st-lum-price','st-win-price','st-margin'],
+    labor: ['la-workers','la-days','la-hrs','la-std-wage','la-margin']
+  };
+  bars[module]?.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){
+      el.removeAttribute('onchange'); // remove validation for admin
+      el.classList.add('fi-admin-unlocked');
+    }
+  });
+  const btn = document.querySelector(`#aeb-${module} .aeb-unlock`);
+  if(btn){btn.textContent='✅ Edición libre — sin validación';btn.disabled=true;}
+  toast('🔓','Edición desbloqueada','Sin restricciones de dimensiones para Admin');
+}
+
+// ════════════════════════════════════════════
+// ADMIN: Show margin panel helper
+// ════════════════════════════════════════════
+function showMarginPanel(prefix, cost, client, pct){
+  if(APP.role !== 'admin') return;
+  const panel = document.getElementById(prefix+'-margin-panel');
+  if(!panel) return;
+  panel.classList.add('visible');
+  const profit = client - cost;
+  const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+  set(prefix+'-mp-cost', '$'+Math.round(cost).toLocaleString());
+  set(prefix+'-mp-client', '$'+Math.round(client).toLocaleString());
+  if(document.getElementById(prefix+'-mp-pct')) set(prefix+'-mp-pct', pct+'%');
+  set(prefix+'-mp-profit', '$'+Math.round(profit).toLocaleString()+' ('+Math.round(profit/cost*100)+'% sobre costo)');
+}
+
+// ════════════════════════════════════════════
+// ════════════════════════════════════════════
+function calcScaff(){
+  const w=+document.getElementById('sc-w').value||40;
+  const h=+document.getElementById('sc-h').value||22;
+  const rate=+document.getElementById('sc-rate').value||35;
+  const wks=+document.getElementById('sc-weeks').value||2;
+  const mrg=+document.getElementById('sc-margin').value||30;
+  const type=document.getElementById('sc-type').value;
+  const bX=Math.ceil(w/5),bY=Math.ceil(h/5);
+  const frames=bX*bY*2,planks=Math.ceil(bX*bY*3.5),braces=bX*bY*2;
+  const ladders=Math.max(1,Math.ceil(w/50)),couplers=frames*4;
+  const plates=(bX+1)*2,jacks=plates,mudsills=plates,rails=bX*bY;
+  const cost=frames*rate*wks,client=Math.round(cost*(1+mrg/100));
+  document.getElementById('sc-mets').innerHTML=[
+    {v:frames,l:'Frames',c:''},{v:bY,l:'Pisos',c:''},{v:planks,l:'Plataformas',c:'ma'},
+    {v:braces,l:'Puntales',c:''},{v:ladders,l:'Escaleras',c:'mg'},{v:couplers,l:'Ormaletas',c:'mb'}
+  ].map((m,i)=>`<div class="met ${m.c}" style="animation-delay:${i*.05}s"><div class="met-v">${m.v}</div><div class="met-l">${m.l}</div></div>`).join('');
+  document.getElementById('sc-tbl').innerHTML=[
+    ['Frames / Módulos',frames,'pcs','Frame 5×5 ft'],
+    ['Plataformas (planks)',planks,'pcs','Tablón 10 ft'],
+    ['Cross Braces',braces,'pcs','2 por bay/piso'],
+    ['Escaleras',ladders,'pcs','1 c/50ft ancho'],
+    ['Base Plates',plates,'pcs','1 por polo vertical'],
+    ['Screw Jacks',jacks,'pcs','Nivelación base'],
+    ['Mudsills',mudsills,'pcs','Distribución de carga'],
+    ['Guard Rails',rails,'pcs','OSHA req >6ft'],
+    ['Ormaletas/Couplers',couplers,'pcs','Conexión de tubos'],
+  ].map(r=>`<tr><td>${r[0]}</td><td class="tv">${r[1]}</td><td class="tu">${r[2]}</td><td class="tu">${r[3]}</td></tr>`).join('');
+  document.getElementById('sc-cost').textContent='$'+cost.toLocaleString();
+  document.getElementById('sc-client').textContent='$'+client.toLocaleString();
+  showMarginPanel('sc', cost, client, mrg);
+  const notes={brick:'Brick: dejar ~4" entre andamio y pared. Verificar necesidad de netting. OSHA 29 CFR 1926.452.',paint:'Pintura: frames estándar. Proteger ventanas. Verificar acceso a cornisas.',stucco:'Estuco: igual al brick. Cuidado con esquinas — pueden requerir frames especiales.',window:'Ventanas: confirmar si necesitan cantilever en algunas áreas.',repair:'Reparaciones: inspección en campo obligatoria antes del estimado final.'};
+  document.getElementById('sc-note').innerHTML=`<strong>NOTAS — ${document.getElementById('sc-type').options[document.getElementById('sc-type').selectedIndex].text}:</strong><br>${notes[type]}<br><br><strong>Área:</strong> ${w*h} sq ft · <strong>Ganancia:</strong> $${(client-cost).toLocaleString()}`;
+  document.getElementById('sc-approval').style.display='block';
+  document.getElementById('sc-res').classList.add('show');
+  document.getElementById('sc-res').scrollIntoView({behavior:'smooth'});
+  addHistory('🏗️',`Andamios ${w}×${h}ft`,0,'free');
+  toast('✅','Estimado de andamios listo',`${frames} frames · $${client.toLocaleString()} al Owner`);
+}
+
+// ════════════════════════════════════════════
+// CALC: EXCAVACION
+// ════════════════════════════════════════════
+function calcExc(){
+  if(!spendCredits(5,'Excavación '+document.getElementById('ex-len').value+'×'+document.getElementById('ex-wid').value+'ft'))return;
+  const len=+document.getElementById('ex-len').value||50,wid=+document.getElementById('ex-wid').value||40;
+  const dep=+document.getElementById('ex-dep').value||8,ext=+document.getElementById('ex-ext').value||3;
+  const sf=+document.getElementById('ex-soil').value||1.15,eqR=+document.getElementById('ex-eq').value||150;
+  const trR=+document.getElementById('ex-truck').value||85,mrg=+document.getElementById('ex-margin').value||20;
+  const eL=len+ext*2,eW=wid+ext*2,area=eL*eW,vRaw=area*dep/27,vReal=vRaw*sf;
+  const trucks=Math.ceil(vReal/14),hrs=Math.ceil(vReal/45*10)/10;
+  const eqC=hrs*eqR,trC=trucks*trR,tot=eqC+trC,client=Math.round(tot*(1+mrg/100));
+  document.getElementById('ex-mets').innerHTML=[
+    {v:Math.round(area).toLocaleString(),l:'Área exc (sq ft)',c:''},{v:Math.round(vRaw),l:'Vol bruto (yd³)',c:''},
+    {v:Math.round(vReal),l:'Vol real (yd³)',c:'ma'},{v:trucks,l:'Viajes camión',c:'ma'},
+    {v:hrs+' hr',l:'Horas equipo',c:''},{v:'$'+Math.round(tot).toLocaleString(),l:'Costo directo',c:'mg'}
+  ].map((m,i)=>`<div class="met ${m.c}" style="animation-delay:${i*.05}s"><div class="met-v">${m.v}</div><div class="met-l">${m.l}</div></div>`).join('');
+  document.getElementById('ex-tbl').innerHTML=[
+    ['Área de excavación',Math.round(area)+' sq ft',eL+'×'+eW+' ft','—'],
+    ['Volumen bruto',Math.round(vRaw)+' yd³','área×'+dep+'ft÷27','—'],
+    ['Factor suelo','×'+sf,document.getElementById('ex-soil').options[document.getElementById('ex-soil').selectedIndex].text,'—'],
+    ['Volumen real',Math.round(vReal)+' yd³','bruto×'+sf,'—'],
+    ['Retroexcavadora',hrs+' hrs','@ $'+eqR+'/hr','$'+Math.round(eqC).toLocaleString()],
+    ['Camiones',trucks+' viajes','@ $'+trR+'/viaje (14yd³)','$'+Math.round(trC).toLocaleString()],
+  ].map(r=>`<tr><td>${r[0]}</td><td class="tv">${r[1]}</td><td class="tu">${r[2]}</td><td class="tv">${r[3]}</td></tr>`).join('');
+  document.getElementById('ex-cost').textContent='$'+Math.round(tot).toLocaleString();
+  document.getElementById('ex-client').textContent='$'+client.toLocaleString();
+  showMarginPanel('ex', tot, client, mrg);
+  document.getElementById('ex-note').innerHTML=`<strong>NOTAS:</strong><br>• Área de corte: ${eL}×${eW} ft (${ext} ft extra c/lado)<br>• Profundidad: ${dep}ft = ${dep*12}" = ${(dep*.3048).toFixed(2)}m<br>• <strong>LLAMAR 811 antes de excavar</strong> (obligatorio USA)<br>• Solicitar permiso de excavación al township antes de iniciar<br>• Ganancia estimada: <strong>$${(client-tot).toLocaleString()}</strong>`;
+  document.getElementById('ex-res').classList.add('show');
+  document.getElementById('ex-res').scrollIntoView({behavior:'smooth'});
+}
+
+// ════════════════════════════════════════════
+// CALC: CIMENTACION
+// ════════════════════════════════════════════
+function calcFound(){
+  if(!spendCredits(10,'Cimentación — estimado'))return;
+  const per=+document.getElementById('fo-per').value||180,h=+document.getElementById('fo-h').value||8;
+  const thick=+document.getElementById('fo-thick').value||10,area=+document.getElementById('fo-area').value||2000;
+  const concP=+document.getElementById('fo-conc-price').value||165;
+  const rebarP=+document.getElementById('fo-rebar-price').value||0.85;
+  const wpP=+document.getElementById('fo-wp-price').value||2.50;
+  const mrg=+document.getElementById('fo-margin').value||20;
+  const type=document.getElementById('fo-type').value;
+  // Wall volume: perimeter × height × thickness(ft)
+  const wallVol=(per*h*(thick/12))/27; // yd³
+  // Slab: area × 0.33ft (4" slab) / 27
+  const slabVol=(area*0.33)/27;
+  const totalConc=type==='slab'?slabVol:wallVol+(type==='poured'?slabVol:0);
+  // Rebar: ~2.4 lb/sq ft of wall face + slab
+  const wallFace=per*h;const rebarLbs=Math.round((wallFace+area)*2.4);
+  // Waterproofing: exterior face of walls
+  const wpArea=per*h;
+  const concCost=totalConc*concP;
+  const rebarCost=rebarLbs*rebarP;
+  const wpCost=type!=='slab'?wpArea*wpP:0;
+  const tot=concCost+rebarCost+wpCost;
+  const client=Math.round(tot*(1+mrg/100));
+  document.getElementById('fo-mets').innerHTML=[
+    {v:Math.round(totalConc),l:'Concreto (yd³)',c:''},{v:rebarLbs.toLocaleString(),l:'Varilla (lbs)',c:'ma'},
+    {v:Math.round(wpArea),l:'Waterproofing (sq ft)',c:'mb'},{v:'$'+Math.round(tot).toLocaleString(),l:'Costo mat.',c:'mg'}
+  ].map((m,i)=>`<div class="met ${m.c}" style="animation-delay:${i*.05}s"><div class="met-v">${m.v}</div><div class="met-l">${m.l}</div></div>`).join('');
+  document.getElementById('fo-tbl').innerHTML=[
+    ['Concreto (paredes+losa)',Math.round(totalConc)+' yd³','@ $'+concP+'/yd³','$'+Math.round(concCost).toLocaleString()],
+    ['Rebar / Varilla',rebarLbs.toLocaleString()+' lbs','@ $'+rebarP+'/lb','$'+Math.round(rebarCost).toLocaleString()],
+    type!=='slab'?['Waterproofing',Math.round(wpArea)+' sq ft','@ $'+wpP+'/sqft','$'+Math.round(wpCost).toLocaleString()]:null,
+  ].filter(Boolean).map(r=>`<tr><td>${r[0]}</td><td class="tv">${r[1]}</td><td class="tu">${r[2]}</td><td class="tv">${r[3]}</td></tr>`).join('');
+  document.getElementById('fo-cost').textContent='$'+Math.round(tot).toLocaleString();
+  document.getElementById('fo-client').textContent='$'+client.toLocaleString();
+  showMarginPanel('fo', tot, client, mrg);
+  document.getElementById('fo-note').innerHTML=`<strong>NOTAS — ${type==='poured'?'Poured Concrete':type==='block'?'CMU Block':'Slab on Grade'}:</strong><br>• Concreto total: ${Math.round(totalConc)} yd³ · Resistencia mínima recomendada: 3,000 PSI (residencial)<br>• Rebar: verificar spacing según IBC Table 1807.1.6 para el tipo de suelo<br>• Waterproofing: aplicar en cara exterior de muro antes de backfill<br>• Código local puede requerir inspección del rebar ANTES de vaciar el concreto<br>• Ganancia estimada: <strong>$${(client-tot).toLocaleString()}</strong>`;
+  document.getElementById('fo-res').classList.add('show');
+  document.getElementById('fo-res').scrollIntoView({behavior:'smooth'});
+}
+
+// ════════════════════════════════════════════
+// CALC: ESTRUCTURA
+// ════════════════════════════════════════════
+function calcStruct(){
+  if(!spendCredits(15,'Estructura — estimado'))return;
+  const area=+document.getElementById('st-area').value||2000;
+  const floors=+document.getElementById('st-floors').value||2;
+  const flh=+document.getElementById('st-flh').value||9;
+  const roof=document.getElementById('st-roof').value;
+  const pitch=+document.getElementById('st-pitch').value||6;
+  const wins=+document.getElementById('st-wins').value||12;
+  const doors=+document.getElementById('st-doors').value||3;
+  const lumP=+document.getElementById('st-lum-price').value||1.20;
+  const winP=+document.getElementById('st-win-price').value||350;
+  const mrg=+document.getElementById('st-margin').value||20;
+
+  // Lumber: ~1 bf per sq ft of floor per floor (rough framing)
+  const lumberBF=Math.round(area*floors*1.15);
+  const lumberCost=lumberBF*lumP;
+
+  // Roof: area × pitch factor
+  const pitchFactor=Math.sqrt(1+(pitch/12)**2);
+  const roofSqFt=Math.round((area/floors)*pitchFactor*(roof==='hip'?1.1:1));
+  const roofSq=Math.ceil(roofSqFt/100); // squares (100sqft each)
+  const roofCost=roofSqFt*2.80; // sheathing + underlayment rough
+
+  const winCost=wins*winP;
+  const doorCost=doors*850; // avg ext door
+  const sheathCost=area*floors*0.65; // wall sheathing
+
+  const tot=lumberCost+roofCost+winCost+doorCost+sheathCost;
+  const client=Math.round(tot*(1+mrg/100));
+
+  document.getElementById('st-mets').innerHTML=[
+    {v:lumberBF.toLocaleString(),l:'Lumber (bf)',c:''},{v:roofSq,l:'Techo (squares)',c:'ma'},
+    {v:wins,l:'Ventanas',c:'mb'},{v:doors,l:'Puertas ext.',c:'mg'}
+  ].map((m,i)=>`<div class="met ${m.c}" style="animation-delay:${i*.05}s"><div class="met-v">${m.v}</div><div class="met-l">${m.l}</div></div>`).join('');
+  document.getElementById('st-tbl').innerHTML=[
+    ['Lumber (framing)',lumberBF.toLocaleString()+' bf','@ $'+lumP+'/bf','$'+Math.round(lumberCost).toLocaleString()],
+    ['Sheathing paredes',area*floors+' sq ft','@ $0.65/sqft','$'+Math.round(sheathCost).toLocaleString()],
+    ['Techo ('+roof+')',roofSq+' squares ('+roofSqFt+' sqft)','sheathing+underlayment','$'+Math.round(roofCost).toLocaleString()],
+    ['Ventanas',wins+' unidades','@ $'+winP+'/u','$'+winCost.toLocaleString()],
+    ['Puertas exteriores',doors+' unidades','@ $850/u','$'+doorCost.toLocaleString()],
+  ].map(r=>`<tr><td>${r[0]}</td><td class="tv">${r[1]}</td><td class="tu">${r[2]}</td><td class="tv">${r[3]}</td></tr>`).join('');
+  document.getElementById('st-cost').textContent='$'+Math.round(tot).toLocaleString();
+  document.getElementById('st-client').textContent='$'+client.toLocaleString();
+  showMarginPanel('st', tot, client, mrg);
+  document.getElementById('st-note').innerHTML=`<strong>NOTAS:</strong><br>• Lumber: precio varía significativamente. Verificar precio actual en el mercado antes del precio final.<br>• Techo: ${roofSq} squares (1 square = 100 sq ft). No incluye shingles ni roofing material final.<br>• Ventanas y puertas: precios estimados — pueden variar 50% según calidad y marca.<br>• No incluye: drywall, insulation, MEP (mecánico/eléctrico/plomería)<br>• Ganancia estimada: <strong>$${(client-tot).toLocaleString()}</strong>`;
+  document.getElementById('st-res').classList.add('show');
+  document.getElementById('st-res').scrollIntoView({behavior:'smooth'});
+}
+
+// ════════════════════════════════════════════
+// CALC: MANO DE OBRA
+// ════════════════════════════════════════════
+function updateWages(){
+  const st=document.getElementById('la-state').value;
+  const w=WAGES[st];
+  if(!w)return;
+  document.getElementById('la-min-wage').value=w.min.toFixed(2);
+  document.getElementById('la-std-wage').value=w.std;
+  document.getElementById('wage-info').innerHTML=`ℹ️ <strong>${w.label}</strong><br>Salario mínimo: $${w.min}/hr · Construcción estándar: $${w.std}/hr`;
+}
+function calcLabor(){
+  if(!spendCredits(8,'Mano de obra — '+document.getElementById('la-state').value))return;
+  const st=document.getElementById('la-state').value;
+  const type=document.getElementById('la-type').value;
+  const workers=+document.getElementById('la-workers').value||4;
+  const days=+document.getElementById('la-days').value||30;
+  const hrsDay=+document.getElementById('la-hrs').value||8;
+  const wage=+document.getElementById('la-std-wage').value||22;
+  const otThresh=+document.getElementById('la-ot-thresh').value||40;
+  const mrg=+document.getElementById('la-margin').value||15;
+
+  const totalHrs=workers*days*hrsDay;
+  const weeksWork=days/5;
+  const hrsPerWorkerPerWeek=hrsDay*5;
+  const otHrsPerWorker=Math.max(0,hrsPerWorkerPerWeek-otThresh);
+  const regHrs=workers*(weeksWork*(Math.min(hrsPerWorkerPerWeek,otThresh)));
+  const otHrs=workers*weeksWork*otHrsPerWorker;
+  const otWage=wage*1.5;
+
+  const regCost=regHrs*wage;
+  const otCost=otHrs*otWage;
+  // Benefits burden: ~30% of base for commercial
+  const burdenRate=type==='residential'?0.18:type==='commercial'?0.28:0.32;
+  const burden=(regCost+otCost)*burdenRate;
+  const tot=regCost+otCost+burden;
+  const client=Math.round(tot*(1+mrg/100));
+
+  document.getElementById('la-mets').innerHTML=[
+    {v:workers,l:'Trabajadores',c:''},{v:days,l:'Días de trabajo',c:''},
+    {v:Math.round(totalHrs).toLocaleString(),l:'Horas totales',c:'ma'},{v:'$'+wage,l:'Salario/hr',c:'mg'}
+  ].map((m,i)=>`<div class="met ${m.c}" style="animation-delay:${i*.05}s"><div class="met-v">${m.v}</div><div class="met-l">${m.l}</div></div>`).join('');
+  document.getElementById('la-tbl').innerHTML=[
+    ['Horas regulares',Math.round(regHrs)+' hrs @ $'+wage+'/hr','$'+Math.round(regCost).toLocaleString()],
+    otHrs>0?['Overtime (1.5×)',Math.round(otHrs)+' hrs @ $'+(otWage).toFixed(2)+'/hr','$'+Math.round(otCost).toLocaleString()]:null,
+    ['Benefits/Burden (~'+Math.round(burdenRate*100)+'%)',type==='government'?'Prevailing wage burden':'Workers comp, payroll taxes, insurance','$'+Math.round(burden).toLocaleString()],
+  ].filter(Boolean).map(r=>`<tr><td>${r[0]}</td><td class="tu">${r[1]}</td><td class="tv">${r[2]}</td></tr>`).join('');
+  document.getElementById('la-cost').textContent='$'+Math.round(tot).toLocaleString();
+  document.getElementById('la-client').textContent='$'+client.toLocaleString();
+  showMarginPanel('la', tot, client, mrg);
+  const w=WAGES[st];
+  document.getElementById('la-note').innerHTML=`<strong>MANO DE OBRA — ${w?.label||st}:</strong><br>• Salario mínimo estatal: $${w?.min||'N/A'}/hr · Salario usado: $${wage}/hr<br>• Overtime: después de ${otThresh} hrs/semana × 1.5 = $${otWage.toFixed(2)}/hr<br>• Benefits burden ${Math.round(burdenRate*100)}%: incluye workers comp, payroll taxes, insurance<br>${type==='government'?'• ⚠️ Proyecto de gobierno: verificar prevailing wage con DOL del estado<br>':''}<br>• Ganancia estimada: <strong>$${(client-tot).toLocaleString()}</strong>`;
+  document.getElementById('la-res').classList.add('show');
+  document.getElementById('la-res').scrollIntoView({behavior:'smooth'});
+}
+
+// ════════════════════════════════════════════
+// REPORTE
+// ════════════════════════════════════════════
+function genReport(){
+  if(!spendCredits(3,'Reporte cliente — '+document.getElementById('rp-name').value))return;
+  const name=document.getElementById('rp-name').value||'Client';
+  const addr=document.getElementById('rp-addr').value||'N/A';
+  const state=document.getElementById('rp-state').value;
+  const date=document.getElementById('rp-date').value||'2026-03-01';
+  const stages=[
+    {id:'exc',label:'1. Excavación y movimiento de tierra'},{id:'found',label:'2. Cimentación / Foundation'},
+    {id:'struct',label:'3. Estructura y framing'},{id:'scaff',label:'4. Andamios y acceso exterior'},
+    {id:'labor',label:'5. Mano de obra'},{id:'ext',label:'6. Acabados exteriores'},
+  ].filter(s=>document.getElementById('rc-'+s.id)?.checked);
+  let tot=0;
+  const rows=stages.map(s=>{const v=+document.getElementById('rv-'+s.id)?.value||0;tot+=v;
+    return `<tr style="border-bottom:1px solid #f0f0f0"><td style="padding:11px 14px;color:#333;font-weight:500">${s.label}</td><td style="padding:11px 14px;text-align:right;font-family:monospace;font-weight:700">$${v.toLocaleString()}</td></tr>`;}).join('');
+  document.getElementById('rp-preview').innerHTML=`
+    <div style="display:flex;align-items:center;gap:14px;padding-bottom:18px;margin-bottom:22px;border-bottom:2px solid #D4A017">
+      <div style="width:42px;height:42px;background:#D4A017;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.3rem">📐</div>
+      <div><div style="font-size:1.5rem;font-weight:800;color:#1a1a1a;letter-spacing:-0.5px">ESTIMADO DE CONSTRUCCIÓN</div>
+      <div style="font-size:.65rem;color:#aaa;text-transform:uppercase;letter-spacing:2px">Documento profesional · Uso exclusivo del Client</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px;font-size:.87rem">
+      <div><div style="font-size:.62rem;color:#aaa;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">Client</div><strong>${name}</strong></div>
+      <div><div style="font-size:.62rem;color:#aaa;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">Dirección</div><strong>${addr}</strong></div>
+      <div><div style="font-size:.62rem;color:#aaa;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">Estado</div><strong>${state}</strong></div>
+      <div><div style="font-size:.62rem;color:#aaa;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">Inicio estimado</div><strong>${date}</strong></div>
+    </div>
+    <table style="width:100%;border-collapse:collapse;margin-bottom:0">
+      <thead><tr style="background:#F9F5EC"><th style="padding:10px 14px;text-align:left;font-size:.65rem;text-transform:uppercase;letter-spacing:1px;color:#888">Etapa del proyecto</th><th style="padding:10px 14px;text-align:right;font-size:.65rem;text-transform:uppercase;letter-spacing:1px;color:#888">Precio estimado</th></tr></thead>
+      <tbody>${rows}</tbody>
+      <tfoot><tr style="background:#D4A017"><td style="padding:14px;color:#000;font-weight:800;font-size:.95rem">TOTAL ESTIMADO</td><td style="padding:14px;text-align:right;color:#000;font-weight:900;font-size:1.15rem;font-family:monospace">$${tot.toLocaleString()}</td></tr></tfoot>
+    </table>
+    <div style="margin-top:18px;background:#FAFAF8;border-left:3px solid #D4A017;padding:13px 15px;font-size:.76rem;color:#666;line-height:1.8">
+      <strong style="color:#333">Condiciones del estimado:</strong><br>
+      • Precisión ±15% — sujeto a ajuste tras inspección en campo.<br>
+      • No incluye permit fees, impuestos, ni soil testing.<br>
+      • Se recomienda revisión de ingeniero licenciado antes de iniciar.<br>
+      • Precios válidos por <strong>30 días</strong> a partir de la fecha de este documento.
+    </div>
+    <div style="margin-top:16px;font-size:.62rem;color:#ccc;text-align:center;font-family:monospace">
+      Estimado generado profesionalmente · ${new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}
+    </div>`;
+  document.getElementById('rp-res').classList.add('show');
+  document.getElementById('rp-res').scrollIntoView({behavior:'smooth'});
+}
+
+function doPrint(){
+  const c=document.getElementById('rp-preview').innerHTML;
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><title>FamPro — Estimado Profesional</title><style>body{max-width:700px;margin:40px auto;padding:20px;font-family:sans-serif}</style></head><body>${c}</body></html>`);
+  w.document.close();
+  setTimeout(()=>w.print(),600);
+}
+
+// ════════════════════════════════════════════
+// TOAST
+// ════════════════════════════════════════════
+let tTimer;
+function toast(ico,msg,sub,dur=3000){
+  const el=document.getElementById('toast');
+  document.getElementById('t-ico').textContent=ico;
+  document.getElementById('t-msg').textContent=msg;
+  document.getElementById('t-sub').textContent=sub;
+  el.classList.add('show');
+  clearTimeout(tTimer);
+  tTimer=setTimeout(()=>el.classList.remove('show'),dur);
+}
+
+// ════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════
+document.getElementById('rp-date').value=new Date(Date.now()+7*86400000).toISOString().split('T')[0];
+document.getElementById('eng-date').textContent=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+updateWages(); // init wages with TX
+</script>
+</body>
+</html>
